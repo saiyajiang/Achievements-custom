@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>故障排除 | Achievements 文档</title>
+    <link rel="stylesheet" href="assets/style.css" />
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body data-page="troubleshooting">
+    <div class="site-shell">
+      <aside class="sidebar">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">A</span>
+          <span>
+            <strong>Achievements 文档</strong>
+            <small>设置与配置</small>
+          </span>
+        </a>
+        <nav class="nav" data-nav>
+          <a href="index.html" data-nav-id="home">总览</a>
+          <a href="setup.html" data-nav-id="setup">设置</a>
+          <a href="platforms.html" data-nav-id="platforms">平台</a>
+          <a href="customization.html" data-nav-id="customization"
+            >个性化</a
+          >
+          <a href="troubleshooting.html" data-nav-id="troubleshooting"
+            >故障排除</a
+          >
+        </nav>
+      </aside>
+
+      <main class="content">
+        <section class="page-head">
+          <p class="eyebrow">故障排除</p>
+          <h1>兼容性说明、已知限制与实用解决办法。</h1>
+          <p>
+            遇到浮层、通知或兼容性问题时，请查阅本页。
+          </p>
+        </section>
+
+        <section class="section split">
+          <article class="panel">
+            <h2>游戏兼容性</h2>
+            <ul class="clean-list">
+              <li>
+                在 <strong>无边框窗口</strong> 模式下运行的游戏效果最佳。
+              </li>
+              <li>
+                DirectX 9、10、11 的游戏通常需要使用无边框模式，
+                通知才能显示在游戏窗口之上。
+              </li>
+              <li>
+                全屏模式支持有限，但在 DirectX 12 的游戏中通常表现更好。
+              </li>
+              <li>
+                当本地进度文件受支持时，应用可自动导入已有成就。
+              </li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <h2>已知限制</h2>
+            <ul class="clean-list">
+              <li>
+                让应用与游戏保持相同的权限级别（<code>管理员/管理员</code>
+                或 <code>非管理员/非管理员</code>），浮层行为会更可靠。
+              </li>
+              <li>
+                当 Achievements 以管理员身份运行时，Windows 原生通知的点击激活可能受限。
+                若跳转无效且游戏允许，请以非提权方式运行 Achievements。
+              </li>
+              <li>
+                若浮层快捷键在某个游戏中失效，请改用 3 键组合，
+                并测试 <code>Ctrl+PageUp</code> / <code>Ctrl+PageDown</code> 回退。
+              </li>
+              <li>
+                在提权或受保护的游戏上下文中，浮层拖拽可能失败；
+                此时请改用吸附位置或微调快捷键。
+              </li>
+              <li>
+                浮层对 PlayStation 手柄的原生支持依赖微软 GameInput。
+                缺少它时，仅支持 XInput 兼容手柄。
+              </li>
+              <li>
+                浮层层级顺序可能因 Windows 版本、GPU 驱动和合成模式而异。
+              </li>
+            </ul>
+          </article>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>常见解决办法</h2>
+          </div>
+          <div class="panel">
+            <ul class="clean-list">
+              <li>
+                切换 <strong>禁用硬件加速</strong>，并保留对你的配置最稳定的模式。
+              </li>
+              <li>
+                如果浮层快捷键有效但看不到任何内容，请尝试重新开启硬件加速并重启应用。
+              </li>
+              <li>
+                如果 Special K 或其他注入工具处于活动状态，请启用
+                <strong>强制对浮层使用 globalShortcut</strong>。这会将浮层快捷键切换为
+                Electron globalShortcut，禁用基于钩子的拖拽，
+                并可解决受影响系统上的兼容性/合成问题。此外，在<strong>很多情况下</strong>
+                还必须在 Special K 中指明/勾选该选项：
+              </li>
+              <div class="media-frame media-frame--small">
+                <a
+                  class="media-link"
+                  href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/SpecialK.-.Settings.png"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/SpecialK.-.Settings.png"
+                    alt="Special K 设置"
+                    loading="lazy"
+                  />
+                </a>
+              </div>
+              <li>
+                若用户反馈解锁通知显示延迟，请缩短较长的通知持续时间。
+              </li>
+              <li>
+                若背景模糊或分层动画造成卡顿，请使用更轻量的预设。
+              </li>
+              <li>
+                排查问题时，避免同时运行多个浮层或注入类工具。
+              </li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>设置 | Achievements 文档</title>
+    <link rel="stylesheet" href="assets/style.css" />
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body data-page="setup">
+    <div class="site-shell">
+      <aside class="sidebar">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">A</span>
+          <span>
+            <strong>Achievements 文档</strong>
+            <small>设置与配置</small>
+          </span>
+        </a>
+        <nav class="nav" data-nav>
+          <a href="index.html" data-nav-id="home">总览</a>
+          <a href="setup.html" data-nav-id="setup">设置</a>
+          <a href="platforms.html" data-nav-id="platforms">平台</a>
+          <a href="customization.html" data-nav-id="customization"
+            >个性化</a
+          >
+          <a href="troubleshooting.html" data-nav-id="troubleshooting"
+            >故障排除</a
+          >
+        </nav>
+      </aside>
+
+      <main class="content">
+        <section class="page-head">
+          <p class="eyebrow">设置</p>
+          <h1>首次运行流程、手动设置与自动配置。</h1>
+          <p>
+            本页将主要的引导与配置步骤整理为更简短的流程，无需阅读完整的项目
+            README 即可照着操作。
+          </p>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>视频演示</h2>
+            <p>当文字步骤不够清楚时，可以参考这些视频。</p>
+          </div>
+          <div class="panel">
+            <ul class="clean-list">
+              <li>
+                <a
+                  href="https://youtu.be/c1jDfynHd-U"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >首次运行</a
+                >
+                介绍首次启动流程与初始设置。
+              </li>
+              <li>
+                <a
+                  href="https://youtu.be/fsqoKiMGLkw"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >手柄支持</a
+                >
+                包含面板介绍与手柄导航操作。
+              </li>
+              <li>
+                <a
+                  href="https://youtu.be/abdVuDB80Ow"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >手动配置</a
+                >
+                演示手动配置的完整流程。
+              </li>
+              <li>
+                <a
+                  href="https://youtu.be/nOoiU5lPopM"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >自动配置</a
+                >
+                演示监视文件夹、检测以及自动生成配置。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>快速上手</h2>
+          </div>
+          <ol class="steps">
+            <li>
+              打开 <strong>设置</strong>，选择预设（preset）和缩放比例。
+            </li>
+            <li>
+              添加 <strong>监视文件夹</strong>，让应用能够发现存档或模拟器目录。
+            </li>
+            <li>
+              先启动一次游戏，使其存档文件夹或本地成就文件生成。
+            </li>
+            <li>
+              让监视器尽可能自动创建配置，或者手动创建配置。
+            </li>
+            <li>
+              选中该配置并选择语言，即可查看成就、进度和游戏时长。
+            </li>
+            <li>
+              可选：为当前激活的配置静音进度通知。
+            </li>
+          </ol>
+          <div class="media-frame">
+            <a
+              class="media-link"
+              href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.Folders.gif"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.Folders.gif"
+                alt="在设置中配置监视文件夹"
+                loading="lazy"
+              />
+            </a>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>从命令行打开已有配置</h2>
+          </div>
+          <div class="panel">
+            <p>
+              向已安装或已解包的可执行文件同时传入 AppID 和平台，即可直接打开一个已有配置：
+            </p>
+            <pre><code>Achievements.exe --appid=239140/steam
+Achievements.exe --appid=239140 --platform=steam</code></pre>
+            <ul class="clean-list">
+              <li>两种格式都支持且等价。</li>
+              <li>
+                如果 Achievements 已在运行，则会打开已有实例并跳转到匹配的配置。
+              </li>
+              <li>
+                AppID 和平台必须与某个已存在的配置完全匹配。这些参数不会生成配置，也不会启动游戏。
+              </li>
+              <li>
+                支持的平台值与下方 <strong>配置 JSON 参考</strong> 中列出的值相同。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>首次运行引导</h2>
+          </div>
+          <div class="panel">
+            <ul class="clean-list">
+              <li>
+                首次运行时，启动过程可能暂停，并在完整自动扫描开始前显示文件夹选择弹窗。
+              </li>
+              <li>
+                应用会搜索已知的成就特征文件，例如 <code>achievements.json</code>、
+                <code>achievements.ini</code>、<code>stats.bin</code>、奖杯文件以及模拟器进度文件。
+              </li>
+              <li>
+                <strong>开始自动配置</strong> 会保持所选文件夹为激活状态，并静音未勾选的已发现文件夹。
+              </li>
+              <li>
+                <strong>跳过并全部静音</strong> 会立即继续启动，并静音已发现的或默认的自动配置根目录。
+              </li>
+              <li>
+                引导待处理期间，文件夹监视器和启动自动配置扫描会保持推迟状态，以避免生成不需要的配置。
+              </li>
+              <li>
+                引导状态存储在 <code>%APPDATA%\Achievements\preferences.json</code> 中，
+                使用 <code>autoConfigOnboardingCompleted</code>、
+                <code>autoConfigOnboardingVersion</code> 和
+                <code>autoConfigOnboardingCompletedAt</code> 三个字段。
+              </li>
+              <li>
+                若启动仍被阻塞但弹窗不可见，请使用托盘操作 <strong>恢复启动（全部静音）</strong>。
+              </li>
+            </ul>
+            <div class="media-frame">
+              <a
+                class="media-link"
+                href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/First.boot.gif"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/First.boot.gif"
+                  alt="首次启动引导流程"
+                  loading="lazy"
+                />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section class="section split">
+          <article class="panel">
+            <h2>手动配置</h2>
+            <p>使用以下字段创建配置：</p>
+            <ul class="clean-list">
+              <li><strong>名称</strong>：你偏好的标识符。</li>
+              <li>
+                <strong>AppID</strong>：该游戏使用的 Steam AppID 或文件夹标识符。
+              </li>
+              <li>
+                <strong>配置路径</strong>：包含 <code>achievements.json</code> 和
+                <code>img/</code> 的文件夹，留空则自动生成。
+              </li>
+              <li>
+                <strong>存档路径</strong>：进度或存档数据所在位置。
+              </li>
+              <li>
+                <strong>可执行文件</strong> 与 <strong>参数</strong>：可选的启动设置。
+              </li>
+              <li>
+                <strong>进程名</strong>：可选，用于明确指定要监控的进程名。
+              </li>
+            </ul>
+            <p class="note">
+              名称在保存前会被净化处理，磁盘上和游戏时长统计中使用的都是净化后的名称。
+            </p>
+            <div class="media-frame">
+              <a
+                class="media-link"
+                href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Manual-Config.gif"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Manual-Config.gif"
+                  alt="手动创建配置的流程"
+                  loading="lazy"
+                />
+              </a>
+            </div>
+          </article>
+
+          <article class="panel">
+            <h2>配置 JSON 参考</h2>
+            <ul class="clean-list">
+              <li><code>appid</code> —— 游戏 ID。</li>
+              <li>
+                <code>platform</code> —— 取值之一：steam、steam-official、uplay、
+                ubisoft-official、ea-official、epic、epic-official、gog、
+                gog-official、xbox-pc、retroachievements、xenia、rpcs3、shadps4、
+                markerpatch、madnesspatch、xlivelessness。
+              </li>
+              <li>
+                <code>config_path</code> —— 包含 <code>achievements.json</code> 和图片资源的文件夹。
+              </li>
+              <li>
+                <code>save_path</code> —— 包含本地进度或存档数据的文件夹。
+              </li>
+              <li>
+                <code>process_name</code> —— 用于进程追踪的可执行文件名。
+              </li>
+              <li>
+                <code>executable</code> / <code>arguments</code> —— 可选的启动元数据。
+              </li>
+            </ul>
+            <p class="note">
+              如果 <code>config_path</code> 指向自定义位置，则成就表重新生成和清理操作不会覆盖该文件夹。
+            </p>
+          </article>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>自动配置</h2>
+            <p>
+              当应用能够定期扫描监视文件夹时，自动配置的效果最好。
+            </p>
+          </div>
+          <div class="panel">
+            <ol class="steps">
+              <li>
+                添加一个或多个包含模拟器数据、存档文件夹或启动器缓存的 <strong>监视文件夹</strong>。
+              </li>
+              <li>应用会检测 AppID 并判定平台。</li>
+              <li>
+                当数据源可用时，它会获取游戏名称、成就表、成就数据和图片。
+              </li>
+              <li>然后自动生成配置。</li>
+            </ol>
+            <div class="media-frame">
+              <a
+                class="media-link"
+                href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Auto-Detection.gif"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Auto-Detection.gif"
+                  alt="自动检测与配置生成"
+                  loading="lazy"
+                />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>默认监视文件夹</h2>
+          </div>
+          <div class="panel">
+            <ul class="compact-columns">
+              <li>%PUBLIC%\Documents\Steam\CODEX</li>
+              <li>%PUBLIC%\Documents\Steam\RUNE</li>
+              <li>%PUBLIC%\Documents\OnlineFix</li>
+              <li>%PUBLIC%\Documents\EMPRESS</li>
+              <li>%APPDATA%\Goldberg SteamEmu Saves</li>
+              <li>%APPDATA%\Goldberg UplayEmu Saves</li>
+              <li>%APPDATA%\R1 UplayEmu Saves</li>
+              <li>%APPDATA%\GSE Saves</li>
+              <li>%APPDATA%\EMPRESS</li>
+              <li>%LOCALAPPDATA%\anadius\LSX emu\achievement_watcher</li>
+              <li>%APPDATA%\Steam\CODEX</li>
+              <li>%APPDATA%\SmartSteamEmu</li>
+              <li>%LOCALAPPDATA%\SKIDROW</li>
+              <li>%LOCALAPPDATA%\UniverseLAN</li>
+            </ul>
+            <p class="note">
+              <code>Goldberg UplayEmu Saves</code> 和
+              <code>R1 UplayEmu Saves</code> 使用 Uplay 到 Steam 的映射，
+              同时保留原始的 Uplay AppID 和成就表存储。
+              <code>%LOCALAPPDATA%\UniverseLAN</code> 被视为严格的 GOG 根目录；
+              其目录结构请参见 UniverseLAN 平台指南。
+            </p>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>文件夹重新扫描与黑名单</h2>
+          </div>
+          <div class="panel">
+            <ul class="clean-list">
+              <li>
+                <strong>文件夹 - 重新扫描</strong> 会打开一个包含当前激活监视文件夹的弹窗。
+                可用 <strong>全选</strong> 或 <strong>全不选</strong>，然后只扫描选中的根目录。
+              </li>
+              <li>
+                已忽略的文件夹和已忽略的嵌套文件夹，即使其父级监视文件夹被选中，也仍然排除在外。
+              </li>
+              <li>
+                重新扫描不会清空文件夹忽略列表或 AppID 黑名单。
+              </li>
+              <li>
+                忽略某个已配置游戏时使用的是其 AppID 与平台身份，
+                因此同一 AppID 在其他平台上仍可保持激活。
+              </li>
+              <li>
+                <strong>设置 - 高级 - 添加黑名单 AppID</strong>
+                支持一次添加多个 AppID，包括被错误识别的用户 ID。
+                多个值之间用逗号、空格或换行分隔。
+              </li>
+              <li>
+                <strong>重置黑名单</strong> 会移除全局及平台专属的黑名单条目，
+                但不会移除监视文件夹，也不会重新扫描无关的配置。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>Steam 模拟器进度文件</h2>
+          </div>
+          <div class="panel">
+            <ul class="clean-list">
+              <li>
+                Online-Fix 的解锁状态来自 <code>Achievements.ini</code>。
+                <code>Stats.ini</code> 仅提供已映射的成就进度和进度通知。
+              </li>
+              <li>
+                空的 Online-Fix <code>Stats.ini</code> 仍会保持监控。它不会解锁成就，
+                也不会清空当前缓存；后续写入的统计值会被应用。
+              </li>
+              <li>
+                Tenoke 从 <code>user_stats.ini</code> 读取解锁状态和统计数据。
+                统计值会在可用时通过成就的 <code>operand1</code> 值映射到成就表进度规则。
+              </li>
+              <li>
+                统计数据本身永远不会解锁成就。模拟器的成就状态始终是唯一依据。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>Steam API 密钥行为</h2>
+          </div>
+          <div class="panel">
+            <p>
+              当设置中已保存密钥时，自动配置会优先使用 Steam Web API。
+            </p>
+            <ul class="clean-list">
+              <li>
+                有密钥：应用在可能的情况下使用 Steam Web API 获取成就表和元数据。
+              </li>
+              <li>
+                无密钥：回退到 SteamDB、SteamHunters 和 Exophase，
+                在可用时用于补充语言信息。
+              </li>
+              <li>
+                可用时使用的数据源包括：Steam Web API、SteamDB、SteamHunters、
+                Exophase、GOG 和 Epic。
+              </li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

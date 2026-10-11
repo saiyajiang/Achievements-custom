@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>个性化 | Achievements 文档</title>
+    <link rel="stylesheet" href="assets/style.css" />
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body data-page="customization">
+    <div class="site-shell">
+      <aside class="sidebar">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">A</span>
+          <span>
+            <strong>Achievements 文档</strong>
+            <small>设置与配置</small>
+          </span>
+        </a>
+        <nav class="nav" data-nav>
+          <a href="index.html" data-nav-id="home">总览</a>
+          <a href="setup.html" data-nav-id="setup">设置</a>
+          <a href="platforms.html" data-nav-id="platforms">平台</a>
+          <a href="customization.html" data-nav-id="customization"
+            >个性化</a
+          >
+          <a href="troubleshooting.html" data-nav-id="troubleshooting"
+            >故障排除</a
+          >
+        </nav>
+      </aside>
+
+      <main class="content">
+        <section class="page-head">
+          <p class="eyebrow">个性化</p>
+          <h1>面板、浮层、偏好设置与运行时路径。</h1>
+          <p>
+            本页汇总配置完成后影响应用行为的各项用户可控设置。
+          </p>
+        </section>
+
+        <section class="section">
+          <article class="panel">
+            <h2>面板</h2>
+            <ul class="clean-list">
+              <li>通过 <strong>显示面板</strong> 打开游戏网格。</li>
+              <li>使用搜索快速筛选游戏。</li>
+              <li>
+                按平台筛选，并按名称、进度或最近更新时间排序。
+              </li>
+              <li>点击游戏卡片以加载其配置。</li>
+              <li>
+                使用 <code>Ctrl + 点击</code> 或卡片右键菜单选择多个游戏，
+                然后从操作栏中忽略、删除或清除选择。
+              </li>
+              <li>
+                启用 <strong>显示已拉黑的游戏</strong> 可查看并恢复被忽略的游戏。
+              </li>
+              <li>
+                对已配置可执行文件的游戏使用播放按钮。
+              </li>
+              <li>
+                后台轮询可在游戏进程启动时自动选中该游戏。
+              </li>
+              <li>
+                <code>Esc</code> 或关闭按钮会恢复主界面与输入状态。
+              </li>
+            </ul>
+            <div class="media-frame">
+              <a
+                class="media-link"
+                href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Dashboard.gif"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Dashboard.gif"
+                  alt="面板导航与总览"
+                  loading="lazy"
+                />
+              </a>
+            </div>
+          </article>
+        </section>
+
+        <section class="section">
+          <article class="panel">
+            <h2>个性化</h2>
+            <ul class="clean-list">
+              <li>选择通知预设和屏幕位置。</li>
+              <li>
+                选择 <strong>Windows 原生</strong> 可使用 Windows Toast 通知，
+                替代动画预设。
+              </li>
+              <li>选择通知音效和语言。</li>
+              <li>
+                从
+                <strong>设置 - 高级 - 成就表语言</strong>
+                中选择要生成哪些成就表语言。
+              </li>
+              <li>在 75% 到 200% 之间调整界面缩放。</li>
+              <li>调整成就持续时间和音量。</li>
+              <li>在可用时切换显示隐藏描述。</li>
+              <li>启用关闭到托盘。</li>
+              <li>配置浮层快捷键和交互键。</li>
+              <li>
+                配置 <strong>通知点击动作</strong>，点击后在不可聚焦的浮层或主应用中
+                打开对应的成就。打开主应用会将焦点从游戏移开。
+              </li>
+              <li>
+                存储在操作中心的 Windows 原生通知保留独立的导航路由，
+                使每条可用通知都能打开各自的成就。
+              </li>
+              <li>
+                从 <strong>设置 → 高级 → 渲染</strong> 启用或禁用浮层手柄支持。
+              </li>
+              <li>
+                启用或禁用成就截图、成就录制、进度通知、游戏时长通知以及启动行为。
+              </li>
+              <li>
+                可为当前激活的游戏配置单独静音进度通知。
+              </li>
+              <li>
+                使用 <strong>随 Windows 启动</strong> 为当前可执行文件创建或移除
+                任务计划程序条目。
+              </li>
+              <li>
+                禁用原生进程监视器可改用基于 <code>ps-list</code> 的可执行文件名回退检测。
+                回退模式下无法获取命令行参数。
+              </li>
+            </ul>
+            <div class="media-stack">
+              <div class="media-frame">
+                <a
+                  class="media-link"
+                  href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.General.gif"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.General.gif"
+                    alt="常规设置分区"
+                    loading="lazy"
+                  />
+                </a>
+              </div>
+              <div class="media-frame">
+                <a
+                  class="media-link"
+                  href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.Notification.gif"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.Notification.gif"
+                    alt="通知设置分区"
+                    loading="lazy"
+                  />
+                </a>
+              </div>
+              <div class="media-frame">
+                <a
+                  class="media-link"
+                  href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.Advanced.gif"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.Advanced.gif"
+                    alt="高级设置分区"
+                    loading="lazy"
+                  />
+                </a>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="section split">
+          <article class="panel">
+            <h2>Xbox Game Bar 通知</h2>
+            <ul class="clean-list">
+              <li>
+                可选的 Xbox Game Bar 伴生组件
+                <strong>Achievements Overlay by JokerVerse</strong>
+                可以发送原生 Game Bar 通知。
+              </li>
+              <li>
+                推送内容包括成就解锁、稀有度或白金元数据、点击跳转，
+                以及 <code>当前 / 最大值 • 百分比</code> 格式的文本进度。
+              </li>
+              <li>
+                该伴生组件是可选的。若未安装或未连接，
+                Electron 应用仍可独立运行并使用已配置的通知回退方案。
+              </li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <h2>成就录制</h2>
+            <ul class="clean-list">
+              <li>
+                启用成就录制后，会在每次解锁前后保存一段短视频片段。
+              </li>
+              <li>选择 30 或 60 FPS。</li>
+              <li>
+                选择 10 至 30 秒的总时长，在解锁前后平均分配。
+              </li>
+              <li>
+                录制捕获 Windows 默认输出混音。若系统音频不可用，
+                录制会安全回退为仅视频；不捕获麦克风输入。
+              </li>
+              <li>
+                可选的 GPU HDR 转 SDR 转换可让 H.264/MP4 片段兼容标准 SDR 播放器。
+              </li>
+            </ul>
+          </article>
+        </section>
+
+        <section class="section split">
+          <article class="panel">
+            <h2>更新日志</h2>
+            <ul class="clean-list">
+              <li>
+                <strong>设置 - 更新日志</strong> 列出 GitHub 上的发布版本，
+                包含版本号、发布类型、发布日期和发布说明。
+              </li>
+              <li>
+                发布数据缓存 30 分钟。<strong>刷新</strong> 会请求当前数据，
+                而最后一次有效缓存仍可在离线时使用。
+              </li>
+              <li>
+                发布链接会在默认浏览器中打开 GitHub。远程发布文本按纯文本显示，
+                不会作为 HTML 执行。
+              </li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <h2>实时日志</h2>
+            <ul class="clean-list">
+              <li>
+                <strong>设置 - 日志</strong> 列出已知的应用日志，
+                并会发现日志目录中额外的 <code>.log</code> 文件。
+              </li>
+              <li>
+                所选文件会被实时跟踪，并在文件替换、截断和常规日志轮转时保持同步。
+              </li>
+              <li>
+                搜索以及 <code>DEBUG</code>、<code>INFO</code>、
+                <code>WARN</code>、<code>ERROR</code> 筛选只影响显示的行。
+              </li>
+              <li>
+                <strong>暂停</strong> 会暂停界面更新，
+                <strong>清除视图</strong> 只清除内存中的视图，
+                <strong>打开日志文件夹</strong> 会打开原始文件。
+              </li>
+              <li>
+                初始视图最多包含 1,000 行最近的记录，界面最多保留 2,000 行。
+                监控仅在日志标签页处于活动状态时运行。
+              </li>
+              <li>
+                日志中可能包含本地路径或账号标识符。公开分享前请先检查。
+              </li>
+            </ul>
+          </article>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>运行时数据位置</h2>
+          </div>
+          <div class="panel">
+            <ul class="clean-list mono-list">
+              <li>%APPDATA%\Achievements\configs</li>
+              <li>%APPDATA%\Achievements\configs\schema</li>
+              <li>%APPDATA%\Achievements\images</li>
+              <li>%USERPROFILE%\Pictures\Achievements Screenshots</li>
+              <li>%USERPROFILE%\Videos\Achievements Records</li>
+              <li>%APPDATA%\Achievements\ach_cache</li>
+              <li>%APPDATA%\Achievements\ach_cache\github-releases.json</li>
+              <li>%APPDATA%\Achievements\ach_cache_meta.json</li>
+              <li>%APPDATA%\Achievements\logs</li>
+              <li>%APPDATA%\Achievements\playtime-totals.json</li>
+              <li>%APPDATA%\Achievements\preferences.json</li>
+              <li>%APPDATA%\Achievements\preferences.json.bak</li>
+              <li>%APPDATA%\Achievements\xbox-pc-microsoft-auth.enc</li>
+              <li>%APPDATA%\Achievements\xbox-pc\titles</li>
+              <li>%APPDATA%\Achievements\retroachievements-auth.enc</li>
+              <li>%APPDATA%\Achievements\retroachievements\titles</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>键盘与手柄要点</h2>
+          </div>
+          <div class="panel">
+            <ul class="clean-list">
+              <li>
+                <a
+                  href="https://youtu.be/fsqoKiMGLkw"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >手柄支持</a
+                >
+                包含面板介绍与手柄导航操作。
+              </li>
+              <li>
+                <a
+                  href="https://youtu.be/vDQ_4cNeIe8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >多平台支持 V2 + 浮层手柄支持</a
+                >
+                还包含浮层手柄支持的操作流程。
+              </li>
+            </ul>
+          </div>
+          <div class="media-frame">
+            <a
+              class="media-link"
+              href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.Shortcuts.gif"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.Shortcuts.gif"
+                alt="快捷键与手柄设置"
+                loading="lazy"
+              />
+            </a>
+          </div>
+          <div class="card-grid">
+            <article class="card">
+              <h3>全局</h3>
+              <p>
+                设置：<code>F1</code> / <code>Ctrl+O</code>。面板：
+                <code>F2</code> / <code>Ctrl+D</code>。游玩：<code>P</code> /
+                <code>Ctrl+Enter</code>。
+              </p>
+            </article>
+            <article class="card">
+              <h3>浮层</h3>
+              <p>
+                使用已配置的浮层快捷键切换显示。使用已配置的交互键切换交互模式。
+              </p>
+            </article>
+            <article class="card">
+              <h3>浮层手柄模式</h3>
+              <p>
+                Xbox：<code>View + Menu</code> 切换浮层，按住
+                <code>LB + RB</code> 进入控制模式。PlayStation 使用
+                <code>Share + Options</code> 和 <code>L1 + R1</code>。
+              </p>
+            </article>
+            <article class="card">
+              <h3>主界面</h3>
+              <p>
+                用 <code>Ctrl+N</code> 新建配置。用 <code>F3</code> 切换选项面板。
+                用方向键或手柄方向键（D-pad）导航。
+              </p>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

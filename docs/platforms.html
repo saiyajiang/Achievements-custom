@@ -1,0 +1,1182 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>平台 | Achievements 文档</title>
+    <link rel="stylesheet" href="assets/style.css" />
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body data-page="platforms">
+    <div class="site-shell">
+      <aside class="sidebar">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">A</span>
+          <span>
+            <strong>Achievements 文档</strong>
+            <small>设置与配置</small>
+          </span>
+        </a>
+        <nav class="nav" data-nav>
+          <a href="index.html" data-nav-id="home">总览</a>
+          <a href="setup.html" data-nav-id="setup">设置</a>
+          <a href="platforms.html" data-nav-id="platforms">平台</a>
+          <a href="customization.html" data-nav-id="customization"
+            >个性化</a
+          >
+          <a href="troubleshooting.html" data-nav-id="troubleshooting"
+            >故障排除</a
+          >
+        </nav>
+      </aside>
+
+      <main class="content">
+        <section class="page-head">
+          <p class="eyebrow">平台</p>
+          <h1>平台与模拟器设置指南。</h1>
+          <p>
+            根据游戏在本地存储成就的方式，选择下面对应的章节。
+          </p>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>平台详解视频</h2>
+            <p>这些视频将多个平台的流程集中在一处演示。</p>
+          </div>
+          <div class="panel">
+            <ul class="clean-list">
+              <li>
+                <a
+                  href="https://youtu.be/KwRUo53VTho"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >多平台支持</a
+                >
+                涵盖 Steam Official、Xenia、RPCS3 和 ShadPS4。
+              </li>
+              <li>
+                <a
+                  href="https://youtu.be/vDQ_4cNeIe8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >多平台支持 V2 + 浮层手柄支持</a
+                >
+                涵盖 GOG Galaxy、Ubisoft Connect、EA Desktop 以及浮层手柄支持。
+              </li>
+              <li>
+                <a
+                  href="https://youtu.be/OolPiQePnuA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Epic Games 启动器支持</a
+                >
+                Epic Games 启动器的设置流程。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="media-frame">
+            <a
+              class="media-link"
+              href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.Platform.Guide.gif"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Settings.-.Platform.Guide.gif"
+                alt="设置中的平台指南分区"
+                loading="lazy"
+              />
+            </a>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>平台</h2>
+            <p>
+              官方启动器集成、在线服务以及原生客户端流程。
+            </p>
+          </div>
+          <div class="card-grid">
+            <a class="card card-link" href="#steam-official">
+              <h3>Steam Official</h3>
+              <p>本地统计文件、成就表解析与解锁追踪。</p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#epic-games">
+              <h3>Epic Games</h3>
+              <p>
+                游戏库导入、清单文件解析与官方成就轮询。
+              </p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#xbox-pc">
+              <h3>Xbox PC</h3>
+              <p>
+                微软账号登录、PC 游戏库导入与 Xbox Network 同步。
+              </p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#retroachievements">
+              <h3>RetroAchievements</h3>
+              <p>账号游戏库导入与只读成就轮询。</p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#gog-galaxy">
+              <h3>GOG Galaxy</h3>
+              <p>
+                gameplay 数据库解析与自动生成的官方配置。
+              </p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#ubisoft-connect">
+              <h3>Ubisoft Connect</h3>
+              <p>基于 spool 与日志的官方集成。</p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#ea-desktop">
+              <h3>EA Desktop</h3>
+              <p>
+                日志驱动的成就表生成与官方配置监控。
+              </p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>模拟器与辅助工具</h2>
+          </div>
+          <div class="subsection-head">
+            <h3>模拟器</h3>
+            <p>
+              Goldberg、Uplay、GOG、Epic、EA 以及 Games for Windows - LIVE
+              的辅助工具生成方式。
+            </p>
+          </div>
+          <div class="card-grid">
+            <a class="card card-link" href="#gse">
+              <h3>GSE</h3>
+              <p>
+                使用 Steam 账号数据生成 Goldberg Steam Emulator 配置。
+              </p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#achievement-enabler">
+              <h3>Achievement Enabler</h3>
+              <p>
+                一套自动检测的设置流程，覆盖 Steam、Ubisoft、Epic 和 GOG。
+              </p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#uplay-goldberg">
+              <h3>Uplay Goldberg</h3>
+              <p>基于 Steam AppID 为育碧游戏生成成就表。</p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#uplay-lumaplay">
+              <h3>Uplay LumaPlay</h3>
+              <p>
+                注册表驱动的 Uplay 模拟，带本地成就报告。
+              </p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#xlivelessness">
+              <h3>XLiveLessNess</h3>
+              <p>
+                Games for Windows - LIVE 成就表提取与本地解锁追踪。
+              </p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#gog-universelan">
+              <h3>GOG UniverseLAN</h3>
+              <p>
+                全局 ProductID 存储与受支持的旧版游戏本地设置。
+              </p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#nemirtingas-epic-emu">
+              <h3>NemirtingasEpicEmu</h3>
+              <p>
+                基于命名空间的 Epic 成就生成与本地设置。
+              </p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#anadius-origin-ea-emu">
+              <h3>anadius Origin/EA Emu</h3>
+              <p>基于 Origin Helper 为 EA/Origin 游戏生成配置。</p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+          </div>
+          <div class="subsection-head">
+            <h3>主机模拟器</h3>
+            <p>Xenia、RPCS3 和 ShadPS4 的原生模拟器流程。</p>
+          </div>
+          <div class="card-grid">
+            <a class="card card-link" href="#xenia-canary">
+              <h3>Xenia-Canary</h3>
+              <p>用户配置文件、Content 路径、自动生成的配置。</p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#rpcs3">
+              <h3>RPCS3</h3>
+              <p>奖杯路径、本地进度、成就表生成。</p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+            <a class="card card-link" href="#shadps4">
+              <h3>ShadPS4</h3>
+              <p>现代与旧版奖杯布局、按用户隔离的缓存。</p>
+              <span class="card-cta">跳转到该节</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="steam-official">
+          <div class="section-head">
+            <h2>平台</h2>
+            <p>
+              官方启动器集成、在线服务以及原生客户端流程。
+            </p>
+          </div>
+          <div class="panel">
+            <h2>Steam Official 支持</h2>
+            <ol class="steps">
+              <li>
+                将
+                <code>C:\Program Files (x86)\Steam\appcache\stats</code> 添加到
+                <strong>监视文件夹</strong>。
+              </li>
+              <li>通过 Steam 启动并游玩游戏。</li>
+              <li>
+                应用会读取 Steam 的本地统计文件，解析成就表和图片，
+                自动生成配置，并追踪解锁状态。
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="epic-games">
+          <div class="panel">
+            <h2>Epic Games 启动器支持</h2>
+            <ol class="steps">
+              <li>
+                在 <strong>设置 - 高级</strong> 中连接 Epic 账号，
+                并使用 <strong>导入游戏库</strong>。
+              </li>
+              <li>
+                已拥有且带成就的游戏会被自动导入为 <code>epic-official</code> 配置。
+              </li>
+              <li>
+                本地清单文件用于解析安装路径、可执行文件和进程名。
+              </li>
+              <li>
+                轮询仅针对检测到的正在运行的 Epic 游戏，或所选的 Epic Official 配置执行。
+              </li>
+            </ol>
+            <p class="note">
+              商店图片优先通过 Epic 元数据解析，仅在必要时才回退到 SteamGridDB。
+            </p>
+            <p class="note">
+              对于使用 artifact 或 AppID 而非命名空间的 Epic 模拟文件夹，
+              成就表生成会先解析相关的目录项和命名空间，再继续走正常的 Epic 成就表流程。
+            </p>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="xbox-pc">
+          <div class="panel">
+            <h2>Xbox PC（微软 / Xbox Network）支持</h2>
+            <ol class="steps">
+              <li>
+                打开 <strong>设置 - 高级</strong>，在
+                <strong>Xbox PC（微软 / Xbox Network）</strong> 下选择
+                <strong>连接 Xbox</strong>。
+              </li>
+              <li>
+                使用 Windows Xbox 应用所用的账号，通过微软 OAuth 登录。
+              </li>
+              <li>
+                使用 <strong>导入 Xbox PC</strong>。应用会从 Xbox 档案中读取支持成就的
+                Windows/PC 游戏，扫描本地 <code>XboxGames</code> 和已打包的 GDK 安装，
+                生成 <code>xbox-pc</code> 配置和成就表，
+                并在可用时关联本地可执行文件或 AUMID 信息。
+              </li>
+              <li>
+                所选 Xbox PC 配置的成就状态直接从 Xbox Network 刷新，
+                带请求限流和本地缓存回退。
+              </li>
+            </ol>
+            <h3>重要说明</h3>
+            <ul class="clean-list">
+              <li>
+                排除仅限 Xbox 主机的历史记录。只有当 Xbox 报告了 Windows/PC 设备，
+                或其 Title ID 与本地已安装游戏匹配时，才会导入该游戏。
+              </li>
+              <li>
+                委托给 EA App、Ubisoft Connect 或其他启动器的游戏，
+                在 PC 上可能无法提供 Xbox 成就。
+              </li>
+              <li>
+                微软刷新令牌和 Xbox XSTS 会话以加密方式存储。
+                应用从不索取或存储微软账户密码或 Entra 客户端密钥。
+              </li>
+              <li>
+                实验性认证路由使用的是
+                <a
+                  href="https://github.com/OpenXbox/xbox-webapi-python"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >OpenXbox Xbox-WebAPI 项目</a
+                >
+                公开的桌面 OAuth 身份。该身份不归 Achievements 项目所有；
+                微软可能会限制或撤销其使用，Xbox Network 直连端点也可能拒绝请求。
+              </li>
+              <li>
+                <code>xbox-pc</code> 配置是自动生成的，不应手动创建。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="retroachievements">
+          <div class="panel">
+            <h2>RetroAchievements 支持</h2>
+            <ol class="steps">
+              <li>
+                打开 <strong>设置 - 高级</strong>，输入 RetroAchievements
+                控制面板中的用户名和 Web API 密钥。
+              </li>
+              <li>
+                选择 <strong>连接</strong>，然后 <strong>导入游戏库</strong>。
+                应用会为账号历史创建独立的 <code>retroachievements</code> 配置和成就表。
+              </li>
+              <li>
+                在面板中选择一个 RetroAchievements 配置以启动其 API 轮询器。
+                初始缓存状态之后收到的新解锁会生成通知。
+              </li>
+            </ol>
+            <h3>重要说明</h3>
+            <ul class="clean-list">
+              <li>
+                此集成仅使用只读的 RetroAchievements Web API。
+                它不会扫描模拟器、ROM、进程或本地游戏文件夹。
+              </li>
+              <li>
+                Web API 密钥通过 Electron safeStorage 存储，
+                不会以明文写入偏好设置或配置文件。
+              </li>
+              <li>
+                轮询仅针对在界面中明确选择的 RetroAchievements 配置运行。
+                当选择其他平台或配置，或断开账号时停止。
+              </li>
+              <li>
+                初始导入会静默初始化已有解锁，
+                避免历史解锁造成通知轰炸。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="gog-galaxy">
+          <div class="panel">
+            <h2>GOG Galaxy 启动器支持</h2>
+            <ol class="steps">
+              <li>安装并登录 GOG Galaxy。</li>
+              <li>
+                将
+                <code>%LOCALAPPDATA%\GOG.com\Galaxy\Applications</code> 添加到
+                <strong>监视文件夹</strong>。
+              </li>
+              <li>至少通过 GOG Galaxy 启动并游玩一次游戏。</li>
+              <li>
+                应用会解析本地的 client id 到 product id 映射，监视
+                <code>gameplay.db</code>，生成
+                <code>gog-official</code> 配置，构建
+                <code>achievements.json</code> 和
+                <code>achievementpercentages.json</code>，
+                然后监控后续变化。
+              </li>
+            </ol>
+            <h3>重要说明</h3>
+            <ul class="clean-list">
+              <li>
+                <code>gog-official</code> 是自动生成的，不应手动创建。
+              </li>
+              <li>
+                只有当 <code>gameplay.db</code> 存在且成就表已填充并稳定之后，
+                才会创建配置。
+              </li>
+              <li>
+                如果某游戏只有 <code>Storage</code> 数据而没有
+                <code>Gameplay\&lt;userId&gt;\gameplay.db</code>，
+                应用会检测到安装路径，但会等待 gameplay 数据库生成后再创建配置。
+              </li>
+              <li>
+                运行时进度从 <code>gameplay.db</code> 读取，
+                尽管保存的配置指向具体的 gameplay 文件夹。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="ubisoft-connect">
+          <div class="panel">
+            <h2>Ubisoft Connect 启动器支持</h2>
+            <ol class="steps">
+              <li>安装并登录 Ubisoft Connect。</li>
+              <li>
+                手动将
+                <code>%LOCALAPPDATA%\Ubisoft Game Launcher\spool</code>
+                添加到 <strong>监视文件夹</strong>。
+              </li>
+              <li>
+                至少启动并游玩一次游戏，使本地 spool 或缓存文件生成。
+              </li>
+              <li>
+                应用会检测 <code>spool\&lt;userId&gt;\&lt;productId&gt;.spool</code>，
+                从育碧本地成就缓存生成本地成就表、稀有度附加文件和图片，
+                然后自动创建 <code>ubisoft-official</code> 配置。
+              </li>
+            </ol>
+            <h3>重要说明</h3>
+            <ul class="clean-list">
+              <li>
+                <code>ubisoft-official</code> 由手动监视的 spool 根目录生成，
+                不应手动创建。
+              </li>
+              <li>
+                配置生成会等待 spool 文件和本地成就存档都可用之后才进行。
+              </li>
+              <li>
+                配置指向具体的 <code>spool\&lt;userId&gt;</code> 文件夹，
+                而运行时进度从 <code>&lt;productId&gt;.spool</code> 读取。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="ea-desktop">
+          <div class="panel">
+            <h2>EA Desktop 启动器支持</h2>
+            <ol class="steps">
+              <li>安装并登录 EA Desktop。</li>
+              <li>
+                手动将
+                <code>%LOCALAPPDATA%\Electronic Arts\EA Desktop\Logs</code>
+                添加到 <strong>监视文件夹</strong>。
+              </li>
+              <li>
+                至少启动并游玩一次游戏，使 <code>EADesktopVerbose.log</code>
+                中包含成就集记录。
+              </li>
+              <li>
+                应用会生成本地成就表和图片，创建 <code>ea-official</code> 配置，
+                并监控后续的日志变化。
+              </li>
+            </ol>
+            <h3>重要说明</h3>
+            <ul class="clean-list">
+              <li>
+                <code>ea-official</code> 由手动监视的 EA Desktop 日志根目录生成，
+                不应手动创建。
+              </li>
+              <li>
+                配置生成会等待 EA Desktop 记录下该游戏的完整成就集之后才进行。
+              </li>
+              <li>
+                配置指向 EA Desktop 的 <code>Logs</code> 文件夹；
+                运行时进度从 <code>EADesktopVerbose.log</code> 读取。
+              </li>
+              <li>
+                应用同时也会读取 <code>EADesktopVerbose.bak</code>，
+                避免详细日志轮转时丢失成就事件。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="gse">
+          <div class="section-head">
+            <h2>模拟器</h2>
+            <p>
+              Goldberg、Uplay、GOG、Epic 和 EA 的辅助工具生成方式。
+            </p>
+          </div>
+          <div class="panel">
+            <h2>GSE</h2>
+            <ol class="steps">
+              <li>
+                下载并解压
+                <a
+                  href="https://pixeldrain.com/u/WaJAGkkM"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  ><code>generate_emu_config</code></a
+                >。
+              </li>
+              <li>
+                在该文件夹中创建 <code>my_login.txt</code>，按如下格式保存你的 Steam 账号：
+                <pre><code>username
+password</code></pre>
+              </li>
+              <li>
+                运行 <code>generate_emu_config.exe_user.exe</code> 并输入目标 Steam AppID。
+              </li>
+              <li>
+                如果该账号启用了二次验证（2FA），按提示完成验证码输入。
+              </li>
+              <li>
+                将游戏原始的 <code>steam_api64.dll</code> 重命名为
+                <code>steam_api64.dll.bak</code>。
+              </li>
+              <li>
+                将 <code>_OUTPUT\appid</code> 中的全部内容复制到重命名后的 DLL 旁边。
+              </li>
+              <li>
+                运行一次 <code>gse_generate_interfaces.exe</code>，然后启动游戏。
+              </li>
+              <li>
+                在 Achievements 中，<code>%APPDATA%\GSE Saves</code> 是默认监视文件夹，
+                因此 AppID 可被检测到，配置也能自动生成。
+              </li>
+            </ol>
+            <div class="media-frame">
+              <a
+                class="media-link"
+                href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/GSE.gif"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/GSE.gif"
+                  alt="GSE 配置生成流程"
+                  loading="lazy"
+                />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="achievement-enabler">
+          <div class="panel">
+            <h2>Achievement Enabler（作者 Roschach96）</h2>
+            <ol class="steps">
+              <li>
+                下载最新的
+                <a
+                  href="https://cs.rin.ru/forum/viewtopic.php?p=3581127#p3581127"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  ><code>Achievement Enabler</code></a
+                >
+                版本，并将 ZIP 解压到一个独立的工作文件夹。
+              </li>
+              <li>
+                对于 Steam 和 Ubisoft，将 <code>dummy_account.txt.example</code>
+                重命名为 <code>dummy_account.txt</code>，并填入一个一次性 Steam 账号的凭据。
+                GOG 和 Epic 不需要此文件。
+              </li>
+              <li>
+                请备份解压后的文件。该工具在完成后会从游戏文件夹中移除其脚本相关文件。
+              </li>
+              <li>
+                将解压出的所有脚本文件和文件夹复制到游戏主文件夹。
+              </li>
+              <li>
+                运行 <code>_Achievement_Enabler.bat</code> 并按提示操作。
+                这是唯一需要启动的脚本。
+              </li>
+            </ol>
+            <h3>账号文件示例</h3>
+            <pre><code>username
+password</code></pre>
+            <h3>统一设置的工作原理</h3>
+            <ul class="clean-list">
+              <li>
+                脚本会根据游戏文件夹中的文件检测合适的适配器（adapter）。
+                当未检测到其他适配器加载器时，会回退使用 Steam ColdClient。
+              </li>
+              <li>
+                Steam 和 Ubisoft 需要额外的适配器资源文件。
+                请使用当前 Achievement Enabler 版本提供的文件和版本信息。
+              </li>
+              <li>
+                该设置会执行破解状态检查、查找或确认 Steam AppID、获取成就数据、
+                检查启动参数、生成平台配置、将游戏导出到 Achievements、
+                创建桌面快捷方式，并清理其临时脚本文件。
+              </li>
+              <li>
+                对于 Ubisoft Uplay R1/R2，相应的加载器和 INI 文件必须已存在。
+                若缺失，设置会中止并提示先应用所需的适配器文件再重新运行。
+              </li>
+              <li>
+                对于 Steam ColdClient，按提示选择使用干净的 Steam 文件或
+                <code>voices38</code> 版本流程。若在设置前
+                <code>voices38.dll</code> 已存在，安全检查会中止并提示先干净重装再重试。
+              </li>
+              <li>
+                生成的 JokerVerse 配置包含检测到的可执行文件和进程信息，
+                以便 Achievements 用于启动、选择和游戏时长监控。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="uplay-goldberg">
+          <div class="panel">
+            <h2>Uplay Goldberg 方法</h2>
+            <ol class="steps">
+              <li>
+                下载
+                <a
+                  href="https://pixeldrain.com/u/s9UuXLm9"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  ><code>Uplay.rar</code></a
+                >。
+              </li>
+              <li>
+                解压 Uplay.rar，并将 Uplay 文件夹复制到
+                <a
+                  href="https://pixeldrain.com/u/8SpYjB6w"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  ><code>generate_emu_config</code></a
+                >
+                文件夹中。
+              </li>
+              <li>
+                在该文件夹中创建 <code>my_login.txt</code>，按如下格式保存你的 Steam 账号：
+                <pre><code>username
+password</code></pre>
+              </li>
+              <li>
+                打开 <code>generate_uplay_achievements_from_steam.bat</code> 文件，
+                使用该育碧游戏的 Steam AppID 运行它。
+              </li>
+              <li>
+                这会为该 Uplay 游戏生成 <code>achievements_schema.json</code>。
+              </li>
+              <li>
+                将 demde 版本的 Goldberg Uplay R1 或 R2 文件以及
+                <code>achievements_schema.json</code> 复制到游戏文件夹，
+                替换原始的 Uplay DLL。请检查 Uplay R1/R2 的 ini 文件，
+                确认已启用 Achievements 配置。
+              </li>
+              <li>
+                若游戏使用 r2 版本，启动游戏。Achievements 可从默认监视文件夹
+                <code>%APPDATA%\Goldberg UplayEmu Saves</code> 自动检测到它。
+              </li>
+              <li>
+                若游戏使用 r1 版本，启动游戏。Achievements 可从默认监视文件夹
+                <code>%APPDATA%\R1 UplayEmu Saves</code> 自动检测到它。
+              </li>
+            </ol>
+            <p class="note">
+              视频演示：
+              <a
+                href="https://www.youtube.com/watch?v=9CuoX1HCAOU"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Ubisoft Games with Achievements</a
+              >
+              <br />
+              Uplay 模拟器：
+              <a
+                href="https://cs.rin.ru/forum/viewtopic.php?p=3572254#p3572254"
+                target="_blank"
+                rel="noopener noreferrer"
+                >R1</a
+              >
+              <a
+                href="https://cs.rin.ru/forum/viewtopic.php?p=3547849#p3547849"
+                target="_blank"
+                rel="noopener noreferrer"
+                >R2</a
+              >
+            </p>
+            <div class="media-frame">
+              <a
+                class="media-link"
+                href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Uplay.gif"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/Uplay.gif"
+                  alt="Uplay Goldberg 方法"
+                  loading="lazy"
+                />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="uplay-lumaplay">
+          <div class="panel">
+            <h2>Uplay LumaPlay</h2>
+            <h3>x86 安装</h3>
+            <ol class="steps">
+              <li>
+                将 <code>LumaPlay_x86.exe</code> 和 <code>LumaPlayFiles</code>
+                文件夹复制到游戏文件夹。
+              </li>
+              <li>
+                从
+                <code
+                  >C:\Program Files (x86)\Ubisoft\Ubisoft Game Launcher</code
+                >
+                复制原始的 <code>uplay_r1.dll</code> 到 <code>LumaPlayFiles</code>，
+                并重命名为 <code>UbiAPI.dll</code>。
+              </li>
+              <li>
+                在 <code>LumaPlay.ini</code> 中更新可执行文件名、appid 及其他设置。
+              </li>
+              <li>
+                继续按下面的 x64 成就配置步骤操作。
+              </li>
+            </ol>
+            <h3>x64 安装</h3>
+            <ol class="steps">
+              <li>
+                将 <code>LumaPlay_x64.exe</code> 和 <code>LumaPlayFiles</code>
+                复制到游戏文件夹。
+              </li>
+              <li>
+                从育碧启动器复制 <code>uplay_r164.dll</code> 到
+                <code>LumaPlayFiles</code>，并重命名为 <code>UbiAPI.dll</code>。
+              </li>
+              <li>
+                在 <code>LumaPlay.ini</code> 中更新可执行文件名、appid 及其他设置。
+              </li>
+              <li>
+                配置 <code>[Achievements]</code> 分区，例如：
+                <pre><code>[Achievements]
+GenerateAchievementReportOnExit = 1
+NumberOfAchievements = 50
+UplayGameID = 1803
+
+Achievement_1 = The Spark - Complete the game intro by liberating Dutch's island (Solo Campaign only).
+Achievement_2 = You Are Wrath - Be deemed the Sin of Wrath (Solo Campaign only).
+Achievement_3 = Special Delivery - Ensure a baby's safe passage into this world (Solo Campaign only).
+Achievement_4 = Only You - Successfully complete the First Trial (Solo Campaign only).
+...</code></pre>
+              </li>
+              <li>
+                在 Achievements 中启用
+                <strong>设置 - 文件夹 - 启用 LumaPlay 监视器</strong>。
+              </li>
+              <li>
+                通过 LumaPlay 启动游戏。应用会扫描
+                <code>HKCU\SOFTWARE\LumaPlay</code> 下的成就条目，检测 AppID，
+                并在可能时生成带 <code>emu=lumaplay</code> 的匹配 <code>uplay</code> 配置。
+              </li>
+            </ol>
+            <h3>重要说明</h3>
+            <ul class="clean-list">
+              <li>
+                启用期间，原生注册表变更事件会触发成就刷新和通知，
+                无需反复轮询整个注册表树。
+              </li>
+              <li>
+                LumaPlay 注册表监视器仅限 Windows，且仅在启用该选项时启动。
+              </li>
+              <li>
+                禁用它会停止 LumaPlay 注册表监控，但不会禁用监视文件夹监控或常规进程检测。
+              </li>
+            </ul>
+            <p class="note">
+              请确保游戏主文件夹中的 <code>uplay_r1_loader(64).dll</code>
+              尽可能接近原始文件。
+            </p>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="xlivelessness">
+          <div class="panel">
+            <h2>XLiveLessNess 支持</h2>
+            <ol class="steps">
+              <li>
+                为受支持的 Games for Windows - LIVE 游戏安装并配置 XLiveLessNess。
+                若模拟器需要创建其档案数据，则先启动一次游戏。
+              </li>
+              <li>
+                在 <strong>设置 - 文件夹</strong> 中添加已安装的游戏目录。
+                可以添加游戏根目录，也可以添加在受支持的发现深度内包含所需文件的父目录。
+              </li>
+              <li>
+                确认某个可执行文件目录中同时包含 <code>xlive.dll</code>、
+                <code>&lt;game&gt;.exe</code> 和匹配的 <code>&lt;game&gt;.exe.cfg</code>。
+                若文件夹是在这些文件安装之前添加的，请使用 <strong>文件夹 - 重新扫描</strong>。
+              </li>
+              <li>
+                应用会从 <code>&lt;game&gt;.exe.cfg</code> 读取 Title ID，
+                并从可执行文件内嵌的 <code>SPAFILE</code> 资源获取本地化的成就名称和描述、
+                玩家分数（Gamerscore）以及图片。
+              </li>
+              <li>
+                生成 <code>xlivelessness</code> 本地配置和成就表。
+                可执行文件名和进程名会被保存，用于启动、进程检测、自动选择和游戏时长统计。
+              </li>
+              <li>
+                解锁状态从 <code>XLiveLessNess\profile\title\&lt;TITLEID&gt;</code>
+                下每个匹配的 <code>&lt;profile&gt;\achievements.dat</code> 读取。
+              </li>
+            </ol>
+            <h3>预期的游戏侧目录结构</h3>
+            <pre><code>&lt;游戏文件夹&gt;\
+└─ &lt;可执行文件目录&gt;\
+   ├─ xlive.dll
+   ├─ &lt;game&gt;.exe
+   └─ &lt;game&gt;.exe.cfg</code></pre>
+            <h3>重要说明</h3>
+            <ul class="clean-list">
+              <li>
+                发现和 SPAFILE/成就表处理均为异步执行，并显示在标准的生成进度条中。
+              </li>
+              <li>
+                首次生成配置时不需要 <code>achievements.dat</code>。
+                自适应监视器会在 XLiveLessNess 创建档案或 title 路径后挂载。
+              </li>
+              <li>
+                默认的 <code>%LOCALAPPDATA%\XLiveLessNess</code> 根目录和
+                游戏本地的 XLiveLessNess 根目录都会被自适应监控。
+                也可以在 <strong>设置 - 文件夹</strong> 中添加自定义存储根目录。
+              </li>
+              <li>
+                当进程命令行检测可用时，会解析
+                <code>-xllnconfig=&lt;path&gt;</code>，
+                并自动将其所在目录添加为另一个状态根目录。
+              </li>
+              <li>
+                同一 Title ID 的多个可执行文件会作为一个配置中的进程名备选保留。
+                各档案保留独立基线，以避免切换用户时产生虚假通知。
+              </li>
+              <li>
+                当内嵌的 SPAFILE 包含相应本地化时，成就表语言遵循
+                <strong>设置 - 高级 - 成就表语言</strong> 中的选择。
+              </li>
+              <li>
+                应用只读取已安装的可执行文件、title 配置和成就状态，
+                不会修改游戏或模拟器数据。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="gog-universelan">
+          <div class="panel">
+            <h2>GOG UniverseLAN</h2>
+            <h3>当前全局存储布局</h3>
+            <ol class="steps">
+              <li>
+                安装并配置 UniverseLAN，使其游戏数据存储在
+                <code>%LOCALAPPDATA%\UniverseLAN</code> 下。
+              </li>
+              <li>
+                将每个游戏放在一个直接的 ProductID 目录中：
+                <code>%LOCALAPPDATA%\UniverseLAN\&lt;ProductID&gt;</code>。
+              </li>
+              <li>
+                运行时进度必须存在于
+                <code
+                  >%LOCALAPPDATA%\UniverseLAN\&lt;ProductID&gt;\UniverseLANData\Achievements.ini</code
+                >。
+              </li>
+              <li>
+                默认监视根目录被视为严格的 GOG 数据源。应用会将每个直接的 ProductID
+                目录映射为一个 GOG 配置，并监控其 <code>Achievements.ini</code> 文件。
+              </li>
+            </ol>
+            <h3>旧版游戏本地设置</h3>
+            <p>
+              已有的游戏本地 UniverseLAN 安装仍受支持。
+              如果游戏在旧版布局下已正常工作，可继续沿用。
+            </p>
+            <ol class="steps">
+              <li>
+                确认游戏使用的 <code>galaxy64.dll</code> 版本，下载匹配的 UniverseLAN
+                构建，并解压到游戏文件夹。
+              </li>
+              <li>
+                运行 <code>UniverseLANServer64.exe</code> 并保持其开启，然后启动游戏可执行文件。
+              </li>
+              <li>
+                旧版安装会在
+                <code>&lt;gamefolder&gt;\UniverseLANData\Achievements.ini</code
+                > 中生成局部成就数据。
+              </li>
+              <li>
+                将游戏文件夹添加到 <strong>监视文件夹</strong>。
+                旧版发现机制继续使用 <code>UniverseLAN.ini</code> 来识别并生成配置。
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="nemirtingas-epic-emu">
+          <div class="panel">
+            <h2>NemirtingasEpicEmu</h2>
+            <ol class="steps">
+              <li>
+                打开
+                <a
+                  href="https://egdata.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >egdata.app</a
+                >
+                并复制该游戏的 Namespace（命名空间）。
+              </li>
+              <li>
+                解压并运行
+                <a
+                  href="https://pixeldrain.com/u/4WssqvNd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  ><code>fetch_epic_achievements.bat</code></a
+                >。
+              </li>
+              <li>
+                将生成的 <code>achievements_db.json</code> 和成就图片复制到
+                <code>EOSSDK-Win64-Shipping.dll</code> 旁边的 <code>nepice_settings</code> 中。
+              </li>
+              <li>
+                编辑 <code>NemirtingasEpicEmu.json</code>，将 <code>AppId</code>
+                替换为该 Namespace。
+              </li>
+              <li>
+                在游戏可执行文件旁边创建一个 <code>Launcher.txt</code> 文件，
+                写入以下内容，然后将文件重命名为 <code>.bat</code>：
+                <pre><code>@echo off
+cd /d "%~dp0"
+start /b "Alan Wake 2" "AlanWake2.exe" -AUTH_LOGIN=unused -AUTH_PASSWORD=cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd -AUTH_TYPE=exchangecode -epicapp=c4763f236d08423eb47b4c3008779c84 -epicenv=Prod -EpicPortal -epicusername="Player" -epicuserid=4340353b292a150000e7d9b5a47b6343 -epicsandboxid=c4763f236d08423eb47b4c3008779c84 -epiclocale=en</code></pre>
+                按目标游戏修改其中的值：
+                <code>Alan Wake 2</code> 是窗口标题，
+                <code>AlanWake2.exe</code> 是游戏可执行文件名，
+                <code>epicapp</code> 与 <code>epicsandboxid</code>
+                必须使用从 <code>egdata.app</code> 获取的 Namespace。
+              </li>
+              <li>
+                将 <code>%APPDATA%\NemirtingasEpicEmu</code> 添加到
+                <strong>监视文件夹</strong>。应用可检测到 Namespace 并自动生成配置。
+              </li>
+            </ol>
+            <div class="media-frame">
+              <a
+                class="media-link"
+                href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/NemirtingasEpicEmu.gif"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/NemirtingasEpicEmu.gif"
+                  alt="NemirtingasEpicEmu 设置"
+                  loading="lazy"
+                />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="anadius-origin-ea-emu">
+          <div class="panel">
+            <h2>anadius Origin/EA Emu</h2>
+            <ol class="steps">
+              <li>
+                获取 anadius Origin 模拟器工具，包括<a
+                  href="https://cs.rin.ru/forum/viewtopic.php?f=29&t=115335&hilit=Origin+emulator"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <code>example config + tools.7z</code></a
+                >
+                和
+                <a
+                  href="https://cs.rin.ru/forum/viewtopic.php?t=153179"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  ><code>get_token.exe</code></a
+                >。
+              </li>
+              <li>
+                安装
+                <a
+                  href="https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en "
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  ><code>Tampermonkey 浏览器扩展</code></a
+                >。
+              </li>
+              <li>
+                将 <code>example config + tools</code> 中的
+                <code>Origin Helper.user.js</code> 拖入 Tampermonkey。
+              </li>
+              <li>
+                打开 <code>ea.com</code>，点击左上区域的
+                <strong>Origin Helper</strong>，然后点击
+                <strong>Generate emulator config</strong>。
+              </li>
+              <li>
+                选择游戏的 <code>__Installer\installerdata.xml</code>。
+              </li>
+              <li>
+                勾选以下选项：
+                <ul class="clean-list">
+                  <li><code>Use default port</code></li>
+                  <li><code>Add Content section</code></li>
+                  <li><code>Add placeholder Entitlement</code></li>
+                  <li><code>Add achievements</code></li>
+                </ul>
+                然后点击 <strong>Continue</strong>。
+              </li>
+              <li>
+                在新标签页打开 <code>https://isthereanydeal.com/</code> 并搜索该游戏。
+              </li>
+              <li>
+                打开游戏页面，滚动到或搜索 <strong>Products</strong>，
+                找到 EA Store 条目，复制 <code>Origin.OFR</code> id。
+              </li>
+              <li>
+                将该 id 粘贴到 <strong>Origin Helper</strong> 的输入框中，
+                然后点击 <strong>Continue</strong>。
+              </li>
+              <li>运行 EA App 并登录，然后运行 <code>get_token.exe</code>。</li>
+              <li>
+                复制 <code>get_token.exe</code> 输出的四行内容：
+                access token（访问令牌）、username（用户名）、user ID（用户 ID）和
+                persona ID（角色 ID）。将它们粘贴到 Origin Helper 中并点击
+                <strong>Continue</strong>。
+              </li>
+              <li>
+                在下一个界面，在新标签页中打开 SteamDB 链接，进入
+                <strong>Achievements</strong> 页面，按 <code>F12</code>，
+                然后在控制台中粘贴：
+                <pre><code>copy(document.documentElement.outerHTML)</code></pre>
+              </li>
+              <li>
+                将复制的 HTML 粘贴到 <strong>Origin Helper</strong> 的输入框中。
+                待成就显示为 <strong>Green Fields</strong> 后，点击 <strong>Continue</strong>。
+              </li>
+              <li>
+                保存 <code>anadius.cfg</code>，并将它与
+                <code>anadius32.dll</code> 或 <code>anadius64.dll</code>
+                一起复制到 <code>game.exe</code> 旁边的游戏文件夹中。
+              </li>
+              <li>
+                将
+                <code>%LOCALAPPDATA%\anadius\LSX emu\achievement_watcher</code>
+                添加到 <strong>监视文件夹</strong>。应用可检测到 AppID 并生成配置。
+              </li>
+            </ol>
+            <div class="media-frame">
+              <a
+                class="media-link"
+                href="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/anadius_EA_Emu.gif"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src="https://github.com/PSerban93/Achievements-Docs/releases/download/v1.0/anadius_EA_Emu.gif"
+                  alt="anadius Origin 与 EA 模拟器设置"
+                  loading="lazy"
+                />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="xenia-canary">
+          <div class="section-head">
+            <h2>主机模拟器</h2>
+            <p>Xenia、RPCS3 和 ShadPS4 的原生模拟器流程。</p>
+          </div>
+          <div class="panel">
+            <h2>Xenia-Canary 支持</h2>
+            <ol class="steps">
+              <li>打开 Xenia 并创建一个用户配置文件。</li>
+              <li>
+                将生成的
+                <code>Xenia\Content\xxxxxx\xxxx\xxxx\xxxxxx</code> 路径添加到
+                <strong>监视文件夹</strong>。
+              </li>
+              <li>启动并游玩游戏。</li>
+              <li>
+                应用会读取生成的文件，获取游戏名称、成就表和图片，
+                自动生成配置，并在解锁新成就时显示通知。
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="rpcs3">
+          <div class="panel">
+            <h2>RPCS3 支持</h2>
+            <ol class="steps">
+              <li>
+                将
+                <code>RPCS3\dev_hdd0\home\xxxxxxx\trophy</code> 添加到
+                <strong>监视文件夹</strong>。
+              </li>
+              <li>启动并游玩游戏。</li>
+              <li>
+                应用会读取奖杯文件，获取成就表和图片，自动生成配置，
+                并在解锁时显示通知。
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="section anchor-target" id="shadps4">
+          <div class="panel">
+            <h2>ShadPS4 支持</h2>
+            <ol class="steps">
+              <li>
+                添加 ShadPS4 根文件夹：<code>%APPDATA%\shadPS4</code>。
+              </li>
+              <li>
+                启动并游玩游戏，使 ShadPS4 创建奖杯表和用户进度文件。
+              </li>
+              <li>
+                应用从 <code>%APPDATA%\shadPS4\trophy\&lt;NPWR&gt;\Xml</code> 读取成就表，
+                从 <code>%APPDATA%\shadPS4\trophy\&lt;NPWR&gt;\Icons</code> 复制图标，
+                并从
+                <code
+                  >%APPDATA%\shadPS4\home\&lt;userId&gt;\trophy\&lt;NPWR&gt;.xml</code
+                > 读取进度。
+              </li>
+              <li>
+                当映射关系可用时，会使用本地 ShadPS4 日志或旧版数据将 NPWR 奖杯 ID
+                映射到 CUSA 游戏 ID。
+              </li>
+              <li>
+                所选游戏的所有本地用户进度 XML 文件都会被监控，
+                因此用户切换会被自动检测到。
+              </li>
+            </ol>
+            <h3>重要说明</h3>
+            <ul class="clean-list">
+              <li>
+                当现代布局与旧版布局同时存在时，优先使用现代 ShadPS4 存储。
+              </li>
+              <li>
+                <code
+                  >%APPDATA%\shadPS4\game_data\&lt;CUSA&gt;\TrophyFiles\trophy00</code
+                >
+                下的旧版存储仍受支持。
+              </li>
+              <li>
+                如果存在多个用户，成就缓存按用户隔离。
+              </li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
