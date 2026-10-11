@@ -1,0 +1,230 @@
+{
+  "name": "Achievements",
+  "version": "1.3.1-beta.2",
+  "description": "Achievements",
+  "author": "JokerVerse",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test:xbox-pc": "node tests/xbox-pc.test.js",
+    "test:xlivelessness": "node tests/xlivelessness.test.js && node tests/xlivelessness-folders.test.js",
+    "test:uplay-mapping": "node tests/uplay-mapping-refresh.test.js",
+    "test:screenshot-paths": "node tests/screenshot-paths.test.js",
+    "test:record-paths": "node tests/record-paths.test.js",
+    "test:boot-cache": "node tests/achievement-cache-meta-store.test.js && node tests/dashboard-summary-store.test.js && node tests/uplay-mapping-refresh.test.js",
+    "test:achievement-recorder": "node tests/achievement-recorder.test.js",
+    "test:dashboard-refresh": "node tests/dashboard-refresh.test.js",
+    "test:gamebar-widget": "node tests/gamebar-widget-bridge.test.js",
+    "test:collections": "node tests/game-collections.test.js",
+    "build:recorder": "cargo build --release --locked --manifest-path native/achievement-recorder/Cargo.toml",
+    "copy:recorder": "node -e \"require('fs').copyFileSync('native/achievement-recorder/target/release/achievements-recorder.exe','utils/native/achievements-recorder.exe')\"",
+    "build:hdr-screenshot": "cargo build --release --locked --manifest-path native/hdr-screenshot/Cargo.toml",
+    "copy:hdr-screenshot": "node -e \"const fs=require('fs');fs.mkdirSync('utils/native',{recursive:true});fs.copyFileSync('native/hdr-screenshot/target/release/achievements-hdr-screenshot.exe','utils/native/achievements-hdr-screenshot.exe')\"",
+    "verify:recorder": "node build/verify-recorder.js",
+    "verify:packaged-recorder": "node build/verify-recorder.js --packaged",
+    "verify:hdr-screenshot": "node build/verify-hdr-screenshot.js",
+    "verify:packaged-hdr-screenshot": "node build/verify-hdr-screenshot.js --packaged",
+    "verify:process-tree": "node build/run-electron-script.js build/verify-windows-process-tree.js",
+    "verify:san-runtime": "node build/verify-san-runtime.js",
+    "prepare:process-tree": "npm run verify:process-tree",
+    "prepare:native:windows": "npm run build:recorder && npm run copy:recorder && npm run verify:recorder && npm run build:hdr-screenshot && npm run copy:hdr-screenshot && npm run verify:hdr-screenshot",
+    "prepare:recorder:windows": "npm run prepare:native:windows",
+    "prepare:recorder": "node build/prepare-recorder.js",
+    "pack": "npm run prepare:recorder && npm run dl-browsers && npm run prepare:process-tree && npm run verify:san-runtime && electron-builder --dir && npm run verify:packaged-recorder && npm run verify:packaged-hdr-screenshot",
+    "dl-browsers": "node build/prepare-playwright-browsers.js",
+    "dist:self-signed": "npm run prepare:recorder && npm run dl-browsers && npm run prepare:process-tree && npm run verify:san-runtime && node build/build-self-signed.js && npm run verify:packaged-recorder && npm run verify:packaged-hdr-screenshot",
+    "dist": "npm run prepare:recorder && npm run dl-browsers && npm run prepare:process-tree && npm run verify:san-runtime && electron-builder --win --x64 --publish never && npm run verify:packaged-recorder && npm run verify:packaged-hdr-screenshot",
+    "dist:signed": "npm run prepare:recorder && npm run dl-browsers && npm run prepare:process-tree && npm run verify:san-runtime && electron-builder --win --x64 --publish never --config.forceCodeSigning=true && npm run verify:packaged-recorder && npm run verify:packaged-hdr-screenshot",
+    "dist:unsigned": "npm run prepare:recorder && npm run dl-browsers && npm run prepare:process-tree && npm run verify:san-runtime && electron-builder --win --x64 --publish never --config.win.signExecutable=false --config.forceCodeSigning=false && npm run verify:packaged-recorder && npm run verify:packaged-hdr-screenshot"
+  },
+  "build": {
+    "appId": "com.saiyajiang.achievements",
+    "productName": "Achievements",
+    "copyright": "Copyright © 2025 JokerVerse; fork maintained by saiyajiang",
+    "npmRebuild": false,
+    "asarUnpack": [
+      "utils/**",
+      "utils/pslist-wrapper.mjs",
+      "**/node_modules/adm-zip/**",
+      "**/node_modules/tar-stream/**",
+      "**/node_modules/b4a/**",
+      "**/node_modules/bare-events/**",
+      "**/node_modules/bare-fs/**",
+      "**/node_modules/bare-path/**",
+      "**/node_modules/bare-stream/**",
+      "**/node_modules/bare-url/**",
+      "**/node_modules/events-universal/**",
+      "**/node_modules/fast-fifo/**",
+      "**/node_modules/streamx/**",
+      "**/node_modules/teex/**",
+      "**/node_modules/text-decoder/**",
+      "**/node_modules/@vscode/windows-process-tree/**",
+      "**/node_modules/screenshot-desktop/**",
+      "**/node_modules/playwright/**",
+      "**/node_modules/playwright-core/**"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "artifactName": "${productName}-Setup-${version}.${ext}",
+    "files": [
+      "icon.ico",
+      "main.js",
+      "windows-signing-policy.json",
+      "preload.js",
+      "index.html",
+      "san-notification.html",
+      "overlay.html",
+      "progress.html",
+      "playtime.html",
+      "utils/playtime-log-watcher.js",
+      "style.css",
+      "tray-menu.html",
+      "tray-menu.js",
+      "tray-menu.css",
+      "sounds/**/*",
+      "presets/**/*",
+      "utils/**/*",
+      "utils/pslist-wrapper.mjs",
+      "assets/**",
+      "!**/*.pfx",
+      "!**/*.p12",
+      "!**/*.pvk",
+      "!**/*.key",
+      "!**/*.password",
+      "!**/node_modules/screenshot-desktop/lib/win32/**",
+      "!**/node_modules/playwright/.local-browsers${/*}",
+      "!**/node_modules/playwright-core/.local-browsers${/*}"
+    ],
+    "extraResources": [
+      {
+        "from": "sounds",
+        "to": "sounds"
+      },
+      {
+        "from": "presets",
+        "to": "presets"
+      },
+      {
+        "from": "icon.ico",
+        "to": "icon.ico"
+      },
+      {
+        "from": "tools/schema_parse.zip",
+        "to": "tools/schema_parse.zip"
+      },
+      {
+        "from": "node_modules/playwright-core/.local-browsers",
+        "to": "playwright-browsers"
+      }
+    ],
+    "win": {
+      "requestedExecutionLevel": "requireAdministrator",
+      "signAndEditExecutable": true,
+      "signtoolOptions": {
+        "signingHashAlgorithms": [
+          "sha256"
+        ],
+        "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+      },
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Achievements"
+    },
+    "afterPack": "build/afterPack.js",
+    "afterSign": "build/afterSign.js",
+    "artifactBuildCompleted": "build/verify-signed-artifact.js",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "saiyajiang",
+        "repo": "Achievements"
+      }
+    ],
+    "linux": {
+      "files": [
+        "icon.ico",
+        "main.js",
+        "windows-signing-policy.json",
+        "preload.js",
+        "index.html",
+        "san-notification.html",
+        "overlay.html",
+        "progress.html",
+        "playtime.html",
+        "utils/playtime-log-watcher.js",
+        "style.css",
+        "tray-menu.html",
+        "tray-menu.js",
+        "tray-menu.css",
+        "sounds/**/*",
+        "presets/**/*",
+        "utils/**/*",
+        "utils/pslist-wrapper.mjs",
+        "assets/**",
+        "!**/*.pfx",
+        "!**/*.p12",
+        "!**/*.pvk",
+        "!**/*.key",
+        "!**/*.password",
+        "!**/node_modules/playwright/.local-browsers${/*}",
+        "!**/node_modules/playwright-core/.local-browsers${/*}",
+        "!utils/native/achievements-recorder.exe",
+        "!utils/native/achievements-hdr-screenshot.exe"
+      ]
+    }
+  },
+  "dependencies": {
+    "@vscode/windows-process-tree": ">=0.8.0",
+    "@xboxreplay/xboxlive-auth": "^5.1.0",
+    "adm-zip": "0.6.1",
+    "axios": "1.20.0",
+    "cheerio": "^1.1.2",
+    "chokidar": "5.0.0",
+    "crc-32": "^1.2.2",
+    "electron-updater": "^6.8.3",
+    "ini": "6.0.0",
+    "koffi": "3.3.2",
+    "playwright": "1.63.0",
+    "ps-list": "9.0.0",
+    "screenshot-desktop": "^1.15.6",
+    "tar-stream": "3.2.2",
+    "uiohook-napi": "1.5.5"
+  },
+  "devDependencies": {
+    "electron": "44.5.1",
+    "electron-builder": "^26.8.1",
+    "jsdom": "29.1.1",
+    "resedit": "1.7.2"
+  },
+  "overrides": {
+    "minimatch": ">=10.2.1",
+    "temp": {
+      "rimraf": "^5.0.10"
+    },
+    "glob": {
+      "minimatch": ">=10.2.1"
+    }
+  },
+  "allowScripts": {
+    "electron-winstaller": true,
+    "electron": true,
+    "koffi": true,
+    "@vscode/windows-process-tree": true,
+    "uiohook-napi": true
+  }
+}

@@ -1,0 +1,1911 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Achievements Overlay</title>
+    <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css" />
+    <script src="utils/app-theme.js"></script>
+    <script>
+      (() => {
+        let readyMarked = false;
+        const markReady = () => {
+          if (readyMarked) return;
+          readyMarked = true;
+          try {
+            document.documentElement.classList.add("fa-ready");
+          } catch {}
+        };
+        const isReady = () => {
+          try {
+            if (!document.fonts || typeof document.fonts.check !== "function") {
+              return true;
+            }
+            return (
+              document.fonts.check('16px "Font Awesome 6 Free"') ||
+              document.fonts.check("16px FontAwesome")
+            );
+          } catch {
+            return true;
+          }
+        };
+
+        const primeFonts = async () => {
+          try {
+            if (!document.fonts || typeof document.fonts.load !== "function") {
+              return;
+            }
+            await Promise.allSettled([
+              document.fonts.load('900 16px "Font Awesome 6 Free"'),
+              document.fonts.load('400 16px "Font Awesome 6 Free"'),
+            ]);
+          } catch {}
+        };
+
+        const bootstrap = async () => {
+          if (isReady()) {
+            markReady();
+            return;
+          }
+
+          await primeFonts();
+          if (isReady()) {
+            markReady();
+            return;
+          }
+
+          try {
+            if (document.fonts && document.fonts.ready) {
+              await Promise.race([
+                document.fonts.ready,
+                new Promise((resolve) => setTimeout(resolve, 1200)),
+              ]);
+            }
+          } catch {}
+
+          // Prevent permanent fallback mode if font checks lag or fail to report.
+          markReady();
+        };
+
+        bootstrap();
+      })();
+    </script>
+    <style>
+      :root,
+      :root[data-theme="dracula"] {
+        --app-bg: #282a36;
+        --app-surface: #44475a;
+        --app-text: #f8f8f2;
+        --app-muted: #6272a4;
+        --app-accent: #bd93f9;
+        --app-accent-2: #8be9fd;
+        --app-success: #50fa7b;
+        --app-warning: #ffb86c;
+        --app-attention: #f1fa8c;
+        --app-danger: #ff5555;
+        --app-pink: #ff79c6;
+        --app-overlay-bg: rgba(40, 42, 54, 0.85);
+        --app-overlay-bg-strong: rgba(40, 42, 54, 0.88);
+        --app-overlay-surface: rgba(68, 71, 90, 0.8);
+        --app-overlay-surface-soft: rgba(68, 71, 90, 0.6);
+        --app-overlay-hover: rgba(68, 71, 90, 0.4);
+        --dracula-background: var(--app-bg);
+        --dracula-current-line: var(--app-surface);
+        --dracula-foreground: var(--app-text);
+        --dracula-comment: var(--app-muted);
+        --dracula-cyan: var(--app-accent-2);
+        --dracula-green: var(--app-success);
+        --dracula-orange: var(--app-warning);
+        --dracula-pink: var(--app-pink);
+        --dracula-purple: var(--app-accent);
+        --dracula-red: var(--app-danger);
+        --dracula-yellow: var(--app-attention);
+        --scrollbar-size: 8px;
+      }
+
+      :root[data-theme="dark"] {
+        --app-bg: #111318;
+        --app-surface: #242833;
+        --app-text: #eef2f8;
+        --app-muted: #8d98aa;
+        --app-accent: #7c9cff;
+        --app-accent-2: #63d7ff;
+        --app-success: #54d68a;
+        --app-warning: #f2b84b;
+        --app-attention: #f4dc62;
+        --app-danger: #ff6b6b;
+        --app-pink: #ff77c8;
+        --app-overlay-bg: rgba(17, 19, 24, 0.9);
+        --app-overlay-bg-strong: rgba(17, 19, 24, 0.94);
+        --app-overlay-surface: rgba(36, 40, 51, 0.86);
+        --app-overlay-surface-soft: rgba(36, 40, 51, 0.68);
+        --app-overlay-hover: rgba(124, 156, 255, 0.12);
+      }
+
+      :root[data-theme="light"] {
+        --app-bg: #f5f7fb;
+        --app-surface: #ffffff;
+        --app-text: #1d2430;
+        --app-muted: #647084;
+        --app-accent: #5b5bd6;
+        --app-accent-2: #087ea4;
+        --app-success: #208a4f;
+        --app-warning: #b96500;
+        --app-attention: #8a6a00;
+        --app-danger: #c83d4b;
+        --app-pink: #b23a8e;
+        --app-overlay-bg: rgba(255, 255, 255, 0.92);
+        --app-overlay-bg-strong: rgba(255, 255, 255, 0.96);
+        --app-overlay-surface: rgba(238, 242, 248, 0.92);
+        --app-overlay-surface-soft: rgba(238, 242, 248, 0.76);
+        --app-overlay-hover: rgba(91, 91, 214, 0.1);
+      }
+
+      :root[data-theme="oled"] {
+        --app-bg: #000000;
+        --app-surface: #101014;
+        --app-text: #f4f7fb;
+        --app-muted: #8f9aad;
+        --app-accent: #bd93f9;
+        --app-accent-2: #8be9fd;
+        --app-success: #50fa7b;
+        --app-warning: #ffb86c;
+        --app-attention: #f1fa8c;
+        --app-danger: #ff5555;
+        --app-pink: #ff79c6;
+        --app-overlay-bg: rgba(0, 0, 0, 0.92);
+        --app-overlay-bg-strong: rgba(0, 0, 0, 0.96);
+        --app-overlay-surface: rgba(16, 16, 20, 0.92);
+        --app-overlay-surface-soft: rgba(16, 16, 20, 0.76);
+        --app-overlay-hover: rgba(255, 255, 255, 0.07);
+      }
+
+      :root[data-theme="metro"] {
+        --app-bg: #f3f3f3;
+        --app-surface: #ffffff;
+        --app-text: #1a1a1a;
+        --app-muted: #5f5f5f;
+        --app-accent: #0078d4;
+        --app-accent-2: #0078d4;
+        --app-success: #107c10;
+        --app-warning: #ffb900;
+        --app-attention: #8a6d00;
+        --app-danger: #d13438;
+        --app-pink: #c239b3;
+        --app-overlay-bg: rgba(255, 255, 255, 0.94);
+        --app-overlay-bg-strong: rgba(255, 255, 255, 0.97);
+        --app-overlay-surface: rgba(243, 243, 243, 0.94);
+        --app-overlay-surface-soft: rgba(243, 243, 243, 0.78);
+        --app-overlay-hover: rgba(0, 120, 212, 0.1);
+      }
+
+      :root[data-theme="metro-dark"] {
+        --app-bg: #202020;
+        --app-surface: #2b2b2b;
+        --app-text: #f3f3f3;
+        --app-muted: #c8c8c8;
+        --app-accent: #0078d4;
+        --app-accent-2: #4cc2ff;
+        --app-success: #6ccb5f;
+        --app-warning: #ffb900;
+        --app-attention: #ffd966;
+        --app-danger: #ff5f5f;
+        --app-pink: #d778d6;
+        --app-overlay-bg: rgba(32, 32, 32, 0.94);
+        --app-overlay-bg-strong: rgba(23, 23, 23, 0.96);
+        --app-overlay-surface: rgba(43, 43, 43, 0.94);
+        --app-overlay-surface-soft: rgba(58, 58, 58, 0.78);
+        --app-overlay-hover: rgba(0, 120, 212, 0.18);
+      }
+
+      :root[data-theme="aero"] {
+        --app-bg: #c9e4f8;
+        --app-surface: rgba(235, 247, 255, 0.78);
+        --app-text: #102033;
+        --app-muted: #4e657d;
+        --app-accent: #2d7dd2;
+        --app-accent-2: #00a2e8;
+        --app-success: #2f8f4e;
+        --app-warning: #c47a00;
+        --app-attention: #8f6c00;
+        --app-danger: #b63a45;
+        --app-pink: #a64d9f;
+        --app-overlay-bg: rgba(226, 243, 255, 0.78);
+        --app-overlay-bg-strong: rgba(205, 229, 247, 0.86);
+        --app-overlay-surface: rgba(255, 255, 255, 0.7);
+        --app-overlay-surface-soft: rgba(218, 236, 250, 0.64);
+        --app-overlay-hover: rgba(91, 173, 235, 0.28);
+      }
+
+      :root[data-theme="aero-dark"] {
+        --app-bg: #142230;
+        --app-surface: rgba(35, 55, 74, 0.88);
+        --app-text: #eef7ff;
+        --app-muted: #b6c8d8;
+        --app-accent: #65b7ff;
+        --app-accent-2: #7ee6ff;
+        --app-success: #6fd18b;
+        --app-warning: #f4b861;
+        --app-attention: #f1d46b;
+        --app-danger: #ff7b86;
+        --app-pink: #e184d8;
+        --app-overlay-bg: rgba(23, 39, 55, 0.94);
+        --app-overlay-bg-strong: rgba(14, 26, 39, 0.96);
+        --app-overlay-surface: rgba(31, 50, 68, 0.9);
+        --app-overlay-surface-soft: rgba(10, 23, 35, 0.66);
+        --app-overlay-hover: rgba(91, 173, 235, 0.22);
+      }
+
+      html,
+      body {
+        background: transparent;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        user-select: none;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--dracula-foreground);
+        height: 100vh;
+      }
+
+      body.overlay-hidden .overlay-shell {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Custom scrollbar (global) */
+      *::-webkit-scrollbar {
+        width: var(--scrollbar-size) !important;
+        height: var(--scrollbar-size) !important;
+      }
+
+      *::-webkit-scrollbar-track {
+        background: transparent !important;
+      }
+
+      *::-webkit-scrollbar-thumb {
+        background: var(--dracula-purple) !important;
+        border-radius: 4px;
+      }
+
+      *::-webkit-scrollbar-thumb:hover {
+        background: var(--dracula-pink) !important;
+      }
+
+      .overlay-shell {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      body.overlay-compact .overlay-shell {
+        height: calc(var(--overlay-top-height, 0px) + 240px);
+      }
+
+      .overlay-container {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        -ms-overflow-style: none;
+        scrollbar-color: var(--dracula-purple) var(--dracula-background);
+        background-color: var(--app-overlay-bg);
+        border-radius: 0 0 12px 12px;
+        /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px); */
+        border: 1px solid var(--dracula-purple);
+        border-top: 0;
+        position: relative;
+        z-index: 1;
+      }
+
+      body.overlay-compact .overlay-container {
+        max-height: 240px;
+        overflow-y: hidden;
+      }
+
+      .overlay-container::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .overlay-container::-webkit-scrollbar-thumb {
+        background-color: var(--dracula-purple);
+        border-radius: 3px;
+      }
+
+      .overlay-container::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+
+      .overlay-top {
+        flex: 0 0 auto;
+        z-index: 10;
+        background: var(--app-overlay-bg-strong);
+        /* backdrop-filter: blur(8px); */
+        pointer-events: auto;
+        border-radius: 12px 12px 0 0;
+        border: 1px solid var(--dracula-purple);
+        border-bottom: 0;
+        cursor: default;
+        touch-action: none;
+      }
+
+      .overlay-header {
+        background-color: var(--app-overlay-surface);
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--dracula-purple);
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        z-index: 3;
+        cursor: move;
+      }
+
+      .overlay-header h2 {
+        margin: 0;
+        color: var(--dracula-purple);
+        font-size: 18px;
+        font-weight: 500;
+      }
+
+      .overlay-stats {
+        background-color: var(--app-overlay-surface-soft);
+        padding: 10px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--dracula-comment);
+        z-index: 3;
+      }
+
+      .stats-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .stats-item i {
+        color: var(--dracula-cyan);
+      }
+
+      .fa-fallback {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        font-family: "Segoe UI Emoji", "Segoe UI Symbol", "Segoe UI", Tahoma,
+          Geneva, Verdana, sans-serif;
+      }
+
+      html:not(.fa-ready) .fa-icon {
+        display: none;
+      }
+
+      html.fa-ready .fa-fallback {
+        display: none;
+      }
+
+      .stats-item .value {
+        font-weight: bold;
+        color: var(--dracula-green);
+      }
+
+      .progress-bar {
+        height: 6px;
+        background-color: var(--dracula-current-line);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 4px;
+        width: 100%;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background-color: var(--dracula-green);
+        border-radius: 3px;
+        transition: width 0.12s ease-out;
+      }
+
+      .progress-fill.no-transition {
+        transition: none !important;
+      }
+
+      .achievements-list {
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+      }
+
+      .achievement-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--dracula-current-line);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: background-color 0.2s ease;
+      }
+
+      .achievement-item:hover {
+        background-color: var(--app-overlay-hover);
+      }
+
+      .achievement-item.notification-navigation-target {
+        background-color: color-mix(
+          in srgb,
+          var(--dracula-purple) 28%,
+          transparent
+        );
+        box-shadow: inset 3px 0 0 var(--dracula-cyan);
+      }
+
+      .achievement-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 6px;
+        object-fit: cover;
+        border: 1px solid var(--dracula-comment);
+        transition:
+          box-shadow 0.2s ease,
+          border-color 0.2s ease;
+      }
+
+      .achievement-icon.rarity-tier-gold {
+        border-color: #f9c74f;
+        box-shadow:
+          0 0 0 1px rgba(249, 199, 79, 0.5),
+          0 0 12px rgba(249, 199, 79, 0.72);
+      }
+
+      .achievement-icon.rarity-tier-silver {
+        border-color: #c7d0d9;
+        box-shadow:
+          0 0 0 1px rgba(199, 208, 217, 0.5),
+          0 0 10px rgba(199, 208, 217, 0.62);
+      }
+
+      .achievement-icon.rarity-tier-bronze {
+        border-color: #cd7f32;
+        box-shadow:
+          0 0 0 1px rgba(205, 127, 50, 0.5),
+          0 0 10px rgba(205, 127, 50, 0.6);
+      }
+
+      .achievement-info {
+        flex: 1;
+      }
+
+      .achievement-name {
+        font-weight: bold;
+        margin-bottom: 4px;
+        color: var(--dracula-cyan);
+      }
+
+      .achievement-description {
+        font-size: 0.9em;
+        color: var(--dracula-foreground);
+        opacity: 0.9;
+        margin-bottom: 4px;
+      }
+
+      .achievement-description .hidden-description-toggle {
+        display: inline;
+        padding: 0;
+        margin: 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        white-space: normal;
+        cursor: pointer;
+      }
+
+      .achievement-description .hidden-description-toggle:hover {
+        text-decoration: underline;
+      }
+
+      .achievement-description .hidden-description-toggle:focus-visible {
+        outline: 2px solid var(--dracula-cyan);
+        outline-offset: 2px;
+      }
+
+      .achievement-progress {
+        font-size: 0.8em;
+        color: var(--dracula-comment);
+      }
+
+      .achievement-status {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        min-width: 90px;
+      }
+
+      .achievement-rarity {
+        color: var(--dracula-cyan);
+        font-size: 0.8em;
+        font-weight: 600;
+      }
+
+      .trophy-tier-label {
+        font-weight: 800;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.72);
+      }
+
+      .trophy-tier-label.trophy-tier-gold {
+        color: #f9c74f;
+      }
+
+      .trophy-tier-label.trophy-tier-silver {
+        color: #c7d0d9;
+      }
+
+      .trophy-tier-label.trophy-tier-bronze {
+        color: #cd7f32;
+      }
+
+      .status-locked {
+        color: var(--dracula-red);
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .status-unlocked {
+        color: var(--dracula-green);
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .achievement-time {
+        font-size: 0.8em;
+        color: var(--dracula-comment);
+      }
+
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+        color: var(--dracula-comment);
+      }
+
+      .empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        color: var(--dracula-purple);
+      }
+
+      .empty-state .fa-fallback {
+        font-size: 48px;
+        margin-bottom: 16px;
+        color: var(--dracula-purple);
+      }
+
+      .empty-state-message {
+        font-size: 16px;
+      }
+    </style>
+  </head>
+
+  <body class="overlay-hidden">
+    <div class="overlay-shell">
+      <div class="overlay-top">
+        <div class="overlay-header">
+          <h2 id="overlayTitle">Achievements</h2>
+          <div id="achievement-count" class="stats-item">
+            <i class="fas fa-trophy fa-icon" aria-hidden="true"></i>
+            <span class="fa-fallback" aria-hidden="true">🏆</span>
+            <span class="value">0/0</span>
+          </div>
+        </div>
+
+        <div class="overlay-stats">
+          <div class="stats-item">
+            <i class="fas fa-chart-simple fa-icon" aria-hidden="true"></i>
+            <span class="fa-fallback" aria-hidden="true">📊</span>
+            <span id="overlayCompletionLabel">Completion:</span>
+            <span id="completion-percentage" class="value">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div
+              id="progress-fill"
+              class="progress-fill"
+              style="width: 0%"
+            ></div>
+          </div>
+        </div>
+      </div>
+      <div class="overlay-container">
+        <div id="empty-state" class="empty-state">
+          <i class="fas fa-gamepad fa-icon" aria-hidden="true"></i>
+          <span class="fa-fallback" aria-hidden="true">🎮</span>
+          <div id="overlayEmptyMessage" class="empty-state-message">
+            Select a game configuration to view achievements
+          </div>
+        </div>
+
+        <ul id="achievements-list" class="achievements-list"></ul>
+      </div>
+    </div>
+
+    <script src="utils/i18n-ui.js"></script>
+    <script>
+      let overlayLang = "english";
+      let overlayUiLang = "english";
+      let overlayPrefs = null;
+      let overlayPrefsLoaded = false;
+      const OVERLAY_ACH_TABLE_STATUS_SEQUENCE = ["all", "locked", "unlocked"];
+      const OVERLAY_ACH_TABLE_SORT_SEQUENCE = ["off", "asc", "desc"];
+      const OVERLAY_ACH_TABLE_STORE = {
+        status: "achTable:status",
+        nameSort: "achTable:nameSort",
+        timeSort: "achTable:timeSort",
+        raritySort: "achTable:raritySort",
+      };
+      function normalizeAppTheme(value) {
+        if (window.AppTheme?.normalizeAppTheme) {
+          return window.AppTheme.normalizeAppTheme(value);
+        }
+        return "dracula";
+      }
+      function applyAppTheme(value) {
+        if (window.AppTheme?.applyAppThemeToDocument) {
+          window.AppTheme.applyAppThemeToDocument(value);
+          return;
+        }
+        document.documentElement.dataset.theme = normalizeAppTheme(value);
+      }
+      function registerOverlayThemes(payload) {
+        if (window.AppTheme?.registerAppThemes && Array.isArray(payload?.themes)) {
+          window.AppTheme.registerAppThemes(payload.themes);
+        }
+      }
+      async function loadOverlayThemes() {
+        try {
+          if (typeof window.api?.listAppThemes === "function") {
+            registerOverlayThemes(await window.api.listAppThemes());
+          }
+        } catch {}
+      }
+      const overlayAchievementTableViewState = {
+        status: "all",
+        nameSort: "off",
+        timeSort: "off",
+        raritySort: "off",
+      };
+      const tUi = (key, fallback) =>
+        window.i18nUi && typeof window.i18nUi.getString === "function"
+          ? window.i18nUi.getString(key, fallback)
+          : fallback;
+      const faWithFallback = (iconClasses, fallbackChar) =>
+        `<i class="${iconClasses} fa-icon" aria-hidden="true"></i><span class="fa-fallback" aria-hidden="true">${fallbackChar}</span>`;
+
+      function readOverlayAchTableStore(key) {
+        try {
+          return localStorage.getItem(key);
+        } catch {
+          return null;
+        }
+      }
+
+      function writeOverlayAchTableStore(key, value) {
+        try {
+          localStorage.setItem(key, value);
+        } catch {}
+      }
+
+      function normalizeOverlayAchievementTableStatus(status) {
+        return OVERLAY_ACH_TABLE_STATUS_SEQUENCE.includes(status)
+          ? status
+          : "all";
+      }
+
+      function normalizeOverlayAchievementTableSort(sortState) {
+        return OVERLAY_ACH_TABLE_SORT_SEQUENCE.includes(sortState)
+          ? sortState
+          : "off";
+      }
+
+      function normalizeOverlayAchievementTableState(payload) {
+        if (!payload || typeof payload !== "object") return null;
+        return {
+          status: normalizeOverlayAchievementTableStatus(
+            String(payload.status || "")
+              .trim()
+              .toLowerCase(),
+          ),
+          nameSort: normalizeOverlayAchievementTableSort(
+            String(payload.nameSort || "")
+              .trim()
+              .toLowerCase(),
+          ),
+          timeSort: normalizeOverlayAchievementTableSort(
+            String(payload.timeSort || "")
+              .trim()
+              .toLowerCase(),
+          ),
+          raritySort: normalizeOverlayAchievementTableSort(
+            String(payload.raritySort || "")
+              .trim()
+              .toLowerCase(),
+          ),
+        };
+      }
+
+      function hydrateOverlayAchievementTableViewStateFromStorage() {
+        const stored = normalizeOverlayAchievementTableState({
+          status: readOverlayAchTableStore(OVERLAY_ACH_TABLE_STORE.status),
+          nameSort: readOverlayAchTableStore(OVERLAY_ACH_TABLE_STORE.nameSort),
+          timeSort: readOverlayAchTableStore(OVERLAY_ACH_TABLE_STORE.timeSort),
+          raritySort: readOverlayAchTableStore(
+            OVERLAY_ACH_TABLE_STORE.raritySort,
+          ),
+        });
+        if (!stored) return;
+        overlayAchievementTableViewState.status = stored.status;
+        overlayAchievementTableViewState.nameSort = stored.nameSort;
+        overlayAchievementTableViewState.timeSort = stored.timeSort;
+        overlayAchievementTableViewState.raritySort = stored.raritySort;
+      }
+
+      function persistOverlayAchievementTableViewStateToStorage() {
+        writeOverlayAchTableStore(
+          OVERLAY_ACH_TABLE_STORE.status,
+          overlayAchievementTableViewState.status,
+        );
+        writeOverlayAchTableStore(
+          OVERLAY_ACH_TABLE_STORE.nameSort,
+          overlayAchievementTableViewState.nameSort,
+        );
+        writeOverlayAchTableStore(
+          OVERLAY_ACH_TABLE_STORE.timeSort,
+          overlayAchievementTableViewState.timeSort,
+        );
+        writeOverlayAchTableStore(
+          OVERLAY_ACH_TABLE_STORE.raritySort,
+          overlayAchievementTableViewState.raritySort,
+        );
+      }
+
+      async function loadOverlayPrefs() {
+        if (overlayPrefsLoaded && overlayPrefs) return overlayPrefs;
+        try {
+          await loadOverlayThemes();
+          overlayPrefs = await window.api.loadPreferences?.();
+          applyAppTheme(overlayPrefs?.appTheme);
+          overlayPrefsLoaded = true;
+        } catch (e) {
+          overlayPrefs = null;
+          overlayPrefsLoaded = false;
+          applyAppTheme(null);
+        }
+        return overlayPrefs || {};
+      }
+      loadOverlayPrefs().catch(() => {});
+
+      let currentConfigName = null;
+      let currentDataHash = null;
+      let isLoading = false;
+      let pendingConfigName = null;
+      let pendingNotificationNavigation = null;
+      const NOTIFICATION_NAVIGATION_TARGET_TIMEOUT_MS = 10000;
+      let notificationNavigationTargetTimer = null;
+      let pendingVisibilityAckPayload = null;
+
+      function dispatchOverlayVisibilityAck(payload, reason = "immediate") {
+        if (!payload) return;
+        const ackPayload = {
+          ...payload,
+          cssHidden: document.body.classList.contains("overlay-hidden"),
+          documentHidden: !!document.hidden,
+          reason,
+        };
+        requestAnimationFrame(() => {
+          try {
+            window.api?.overlayVisibilityAck?.(ackPayload);
+          } catch {}
+        });
+      }
+
+      function flushOverlayVisibilityAck(reason = "flush") {
+        if (!pendingVisibilityAckPayload) return;
+        if (pendingVisibilityAckPayload.visible && isLoading) return;
+        const payload = pendingVisibilityAckPayload;
+        pendingVisibilityAckPayload = null;
+        dispatchOverlayVisibilityAck(payload, reason);
+      }
+
+      function getAppIconUrl() {
+        const q = new URLSearchParams(location.search).get("icon");
+        return q ? decodeURIComponent(q) : "";
+      }
+      function resolveAchievementIcon(imgEl, cfgPath, rel) {
+        const FALLBACK = getAppIconUrl();
+        const r = String(rel || "");
+        const base = r.split(/[\\/]/).pop();
+
+        const candidates = []
+          .concat(r ? [`${cfgPath}\\${r}`] : [])
+          .concat([
+            `${cfgPath}\\achievement_images\\${base}`,
+            `${cfgPath}\\steam_settings\\achievement_images\\${base}`,
+            `${cfgPath}\\img\\${base}`,
+            `${cfgPath}\\images\\${base}`,
+          ])
+          .filter((v, i, a) => v && a.indexOf(v) === i)
+          .map((p) => `file:///${p.replace(/\\/g, "/")}`);
+
+        let i = 0;
+        const tryNext = () => {
+          if (i >= candidates.length) {
+            imgEl.src = FALLBACK;
+            return;
+          }
+          imgEl.onerror = () => {
+            i++;
+            tryNext();
+          };
+          imgEl.src = candidates[i];
+        };
+        tryNext();
+      }
+
+      async function applyOverlayLanguage() {
+        const prefs = await loadOverlayPrefs();
+        const lang = prefs?.uiLanguage || prefs?.language || "english";
+        overlayUiLang = String(lang || "english");
+        if (
+          window.i18nUi &&
+          typeof window.i18nUi.setUiLanguage === "function"
+        ) {
+          await window.i18nUi.setUiLanguage(overlayUiLang);
+        }
+      }
+
+      function getSafeLocalizedText(input, lang = "english") {
+        const hiddenFallback = tUi("overlay.hiddenFallback", "Hidden");
+        if (!input) return hiddenFallback;
+        if (typeof input === "string") return input.trim() || hiddenFallback;
+        if (typeof input === "object") {
+          const requestedLang = String(lang || "english").trim();
+          const requestedLower = requestedLang.toLowerCase();
+          if (
+            requestedLang &&
+            typeof input[requestedLang] === "string" &&
+            input[requestedLang].trim() !== ""
+          ) {
+            return input[requestedLang];
+          }
+          const caseInsensitiveKey = Object.keys(input).find((key) => {
+            return (
+              String(key || "").toLowerCase() === requestedLower &&
+              typeof input[key] === "string" &&
+              input[key].trim() !== ""
+            );
+          });
+          if (caseInsensitiveKey) {
+            return input[caseInsensitiveKey];
+          }
+          return (
+            input.english ||
+            Object.values(input).find(
+              (v) => typeof v === "string" && v.trim() !== "",
+            ) ||
+            hiddenFallback
+          );
+        }
+        return hiddenFallback;
+      }
+
+      function getEffectiveAchievementProgress(saved) {
+        const isEarned = saved?.earned === true || saved?.earned === 1;
+        const rawProgress = Number(saved?.progress);
+        const rawMax = Number(saved?.max_progress);
+        const hasProgress = Number.isFinite(rawProgress);
+        const hasMax = Number.isFinite(rawMax) && rawMax > 0;
+
+        if (!hasProgress || !hasMax) {
+          return {
+            show: false,
+            progress: null,
+            max: hasMax ? rawMax : null,
+            percent: null,
+          };
+        }
+
+        if (isEarned) {
+          return {
+            show: true,
+            progress: rawMax,
+            max: rawMax,
+            percent: 100,
+          };
+        }
+
+        return {
+          show: true,
+          progress: rawProgress,
+          max: rawMax,
+          percent: Math.min(100, Math.round((rawProgress / rawMax) * 100)),
+        };
+      }
+
+      function normalizeEarnedTime(raw) {
+        const t = Number(raw);
+        if (!Number.isFinite(t) || t <= 0) return 0;
+        const ms = String(Math.trunc(t)).length === 10 ? t * 1000 : t;
+        return ms >= 946684800000 ? ms : 0;
+      }
+
+      function formatTimestamp(timestamp) {
+        const ms = normalizeEarnedTime(timestamp);
+        if (!ms) return tUi("overlay.notAvailable", "N/A");
+        const d = new Date(ms);
+        return isNaN(d)
+          ? tUi("overlay.notAvailable", "N/A")
+          : d.toLocaleString();
+      }
+
+      function computeAchievementsHash(achievements, saved, lang) {
+        return achievements
+          .map((ach) => {
+            const name = ach.name;
+            const display = getSafeLocalizedText(ach.displayName, lang);
+            const rarity =
+              ach?.rarityPct ??
+              ach?.rarity_percent ??
+              ach?.unlockRate ??
+              ach?.unlock_rate ??
+              ach?.globalPercent ??
+              ach?.global_percent ??
+              ach?.percent ??
+              (typeof ach?.rarity === "object"
+                ? ach?.rarity?.pct ??
+                  ach?.rarity?.percent ??
+                  ach?.rarity?.value ??
+                  ""
+                : ach?.rarity ?? "");
+            const trophyType = formatTrophyTypeAsRarity(
+              ach?.trophyType || ach?.trophy_type,
+            );
+            const savedData = saved?.achievements?.[name] || {};
+            const earned = savedData.earned ? "1" : "0";
+            const progress = savedData.progress ?? "";
+            const max = savedData.max_progress ?? "";
+            return `${name}-${display}-${rarity}-${trophyType}-${earned}-${progress}-${max}`;
+          })
+          .join("|");
+      }
+
+      function parseRarityPercent(raw) {
+        if (raw === null || raw === undefined) return null;
+        if (typeof raw === "number" && Number.isFinite(raw)) {
+          return Math.min(100, Math.max(0, raw));
+        }
+        if (typeof raw === "string") {
+          const normalized = raw.replace(",", ".").trim();
+          if (!normalized) return null;
+          const m = normalized.match(/-?\d+(?:\.\d+)?/);
+          if (!m) return null;
+          const n = Number(m[0]);
+          if (!Number.isFinite(n)) return null;
+          return Math.min(100, Math.max(0, n));
+        }
+        return null;
+      }
+
+      function resolveRarityPercent(achievement) {
+        const rarityObj = achievement?.rarity;
+        if (rarityObj && typeof rarityObj === "object") {
+          const nested =
+            parseRarityPercent(rarityObj.pct) ??
+            parseRarityPercent(rarityObj.percent) ??
+            parseRarityPercent(rarityObj.value);
+          if (nested !== null) return nested;
+        }
+        const candidates = [
+          achievement?.rarityPct,
+          achievement?.rarity_percent,
+          achievement?.unlockRate,
+          achievement?.unlock_rate,
+          achievement?.globalPercent,
+          achievement?.global_percent,
+          achievement?.percent,
+          typeof achievement?.rarity === "number" ||
+          typeof achievement?.rarity === "string"
+            ? achievement.rarity
+            : null,
+        ];
+        for (const candidate of candidates) {
+          const parsed = parseRarityPercent(candidate);
+          if (parsed !== null) return parsed;
+        }
+        return null;
+      }
+
+      function mapTrophyTypeToRaritySortValue(rawType) {
+        const normalized = String(rawType || "")
+          .trim()
+          .toLowerCase();
+        if (!normalized || normalized === "unknown") return null;
+        if (normalized === "p" || normalized === "platinum") return 0;
+        if (normalized === "g" || normalized === "gold") return 1;
+        if (normalized === "s" || normalized === "silver") return 2;
+        if (normalized === "b" || normalized === "bronze") return 3;
+        return null;
+      }
+
+      function resolveRaritySortValue(
+        achievement,
+        { useTrophyTypeRaritySortFallback = false } = {},
+      ) {
+        const rarityPercent = resolveRarityPercent(achievement);
+        if (rarityPercent !== null) return rarityPercent;
+        if (!useTrophyTypeRaritySortFallback) return null;
+        return mapTrophyTypeToRaritySortValue(
+          achievement?.trophyType || achievement?.trophy_type,
+        );
+      }
+
+      function resolveTrophyModeDisplayTier(achievement) {
+        const rarityPct = resolveRarityPercent(achievement);
+        if (rarityPct === null) return "bronze";
+        if (rarityPct < 20) return "gold";
+        if (rarityPct < 50) return "silver";
+        return "bronze";
+      }
+
+      function getTrophyModeTierLabel(tier) {
+        const labels = {
+          gold: ["trophyTier.gold", "Gold"],
+          silver: ["trophyTier.silver", "Silver"],
+          bronze: ["trophyTier.bronze", "Bronze"],
+        };
+        const entry = labels[tier];
+        return entry ? tUi(entry[0], entry[1]) : "";
+      }
+
+      function resolveRarityGlowTierClass(
+        achievement,
+        { trophyModeEnabled = false } = {},
+      ) {
+        if (trophyModeEnabled) {
+          return `rarity-tier-${resolveTrophyModeDisplayTier(achievement)}`;
+        }
+        const rarityPct = resolveRarityPercent(achievement);
+        if (rarityPct === null) return "";
+        if (rarityPct <= 1) return "rarity-tier-gold";
+        if (rarityPct <= 5) return "rarity-tier-silver";
+        if (rarityPct <= 10) return "rarity-tier-bronze";
+        return "";
+      }
+
+      function formatTrophyTypeAsRarity(rawType) {
+        const normalized = String(rawType || "")
+          .trim()
+          .toLowerCase();
+        if (!normalized || normalized === "unknown") return "";
+        if (normalized === "p" || normalized === "platinum") return "Platinum";
+        if (normalized === "g" || normalized === "gold") return "Gold";
+        if (normalized === "s" || normalized === "silver") return "Silver";
+        if (normalized === "b" || normalized === "bronze") return "Bronze";
+        return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+      }
+
+      function formatRarityPercent(
+        achievement,
+        { includeNativeTrophyType = true } = {},
+      ) {
+        const rarityPct = resolveRarityPercent(achievement);
+        const trophyType = includeNativeTrophyType
+          ? formatTrophyTypeAsRarity(
+              achievement?.trophyType || achievement?.trophy_type,
+            )
+          : "";
+        if (rarityPct !== null) {
+          const rounded = Number.isInteger(rarityPct)
+            ? String(rarityPct)
+            : String(rarityPct.toFixed(2)).replace(/\.?0+$/, "");
+          if (trophyType) return `${trophyType} · ${rounded}%`;
+          return `${rounded}%`;
+        }
+        if (trophyType) return trophyType;
+        return "N/A";
+      }
+
+      function getOverlayAchievementItemDefaultIndex(item) {
+        const n = Number(item?.dataset?.defaultIndex);
+        return Number.isFinite(n) ? n : 0;
+      }
+
+      function getOverlayAchievementItemNumericValue(item, key) {
+        const raw = item?.dataset?.[key];
+        if (raw === undefined || raw === null || raw === "") return null;
+        const n = Number(raw);
+        return Number.isFinite(n) ? n : null;
+      }
+
+      function compareNullableOverlayAchievementValues(
+        a,
+        b,
+        direction = "asc",
+      ) {
+        if (a === null && b === null) return 0;
+        if (a === null) return 1;
+        if (b === null) return -1;
+        return direction === "desc" ? b - a : a - b;
+      }
+
+      function compareOverlayAchievementItemsByCurrentSort(itemA, itemB) {
+        const fallback =
+          getOverlayAchievementItemDefaultIndex(itemA) -
+          getOverlayAchievementItemDefaultIndex(itemB);
+
+        if (overlayAchievementTableViewState.nameSort !== "off") {
+          const aName = String(itemA?.dataset?.sortName || "");
+          const bName = String(itemB?.dataset?.sortName || "");
+          const cmp = aName.localeCompare(bName, undefined, {
+            sensitivity: "base",
+          });
+          if (cmp !== 0) {
+            return overlayAchievementTableViewState.nameSort === "desc"
+              ? -cmp
+              : cmp;
+          }
+          return fallback;
+        }
+
+        if (overlayAchievementTableViewState.timeSort !== "off") {
+          const aValue = getOverlayAchievementItemNumericValue(
+            itemA,
+            "sortEarnedTime",
+          );
+          const bValue = getOverlayAchievementItemNumericValue(
+            itemB,
+            "sortEarnedTime",
+          );
+          const cmp = compareNullableOverlayAchievementValues(
+            aValue,
+            bValue,
+            overlayAchievementTableViewState.timeSort,
+          );
+          if (cmp !== 0) return cmp;
+          return fallback;
+        }
+
+        if (overlayAchievementTableViewState.raritySort !== "off") {
+          const aValue = getOverlayAchievementItemNumericValue(
+            itemA,
+            "sortRarity",
+          );
+          const bValue = getOverlayAchievementItemNumericValue(
+            itemB,
+            "sortRarity",
+          );
+          const cmp = compareNullableOverlayAchievementValues(
+            aValue,
+            bValue,
+            overlayAchievementTableViewState.raritySort,
+          );
+          if (cmp !== 0) return cmp;
+          return fallback;
+        }
+
+        return fallback;
+      }
+
+      function applyOverlayAchievementViewState() {
+        const achievementsList = document.getElementById("achievements-list");
+        if (!achievementsList) return;
+        const items = Array.from(
+          achievementsList.querySelectorAll("li.achievement-item"),
+        );
+        if (!items.length) return;
+
+        items.sort(compareOverlayAchievementItemsByCurrentSort);
+        const frag = document.createDocumentFragment();
+        items.forEach((item) => frag.appendChild(item));
+        achievementsList.appendChild(frag);
+
+        items.forEach((item) => {
+          const isUnlocked = item?.dataset?.sortUnlocked === "1";
+          const statusMatches =
+            overlayAchievementTableViewState.status === "all" ||
+            (overlayAchievementTableViewState.status === "locked" &&
+              !isUnlocked) ||
+            (overlayAchievementTableViewState.status === "unlocked" &&
+              isUnlocked);
+          item.style.display = statusMatches ? "" : "none";
+        });
+      }
+
+      function clearNotificationNavigationTarget() {
+        if (notificationNavigationTargetTimer) {
+          clearTimeout(notificationNavigationTargetTimer);
+          notificationNavigationTargetTimer = null;
+        }
+        document
+          .querySelectorAll(
+            "#achievements-list .notification-navigation-target",
+          )
+          .forEach((item) =>
+            item.classList.remove("notification-navigation-target"),
+          );
+      }
+
+      function reportNotificationNavigationResult(
+        pending,
+        success,
+        reason = "",
+      ) {
+        if (!pending) return;
+        try {
+          window.api?.overlayNavigationResult?.({
+            requestId: String(pending.requestId || ""),
+            success: success === true,
+            reason: String(reason || ""),
+            configName: String(pending.configName || currentConfigName || ""),
+            achievementId: String(pending.achievementId || ""),
+          });
+        } catch {}
+      }
+
+      function flushPendingNotificationNavigation() {
+        const pending = pendingNotificationNavigation;
+        if (!pending || isLoading) return false;
+        if (
+          String(pending.configName || "") !== String(currentConfigName || "")
+        ) {
+          // On the first presentation the navigation IPC can arrive as soon as
+          // this renderer declares itself ready, just before main sends the
+          // initial config. Keep the route pending; loadAchievements() flushes
+          // it after that config and its rows are ready.
+          window.api?.logOverlayEvent?.(
+            "debug",
+            "notification-navigation:overlay-renderer-waiting",
+            {
+              reason: "config-not-ready",
+              currentConfig: currentConfigName || null,
+              notificationConfig: pending.configName || null,
+            },
+          );
+          return false;
+        }
+        const achievementId = String(pending.achievementId || "").trim();
+        const item = Array.from(
+          document.querySelectorAll("#achievements-list li.achievement-item"),
+        ).find(
+          (candidate) =>
+            String(candidate?.dataset?.achievementName || "") === achievementId,
+        );
+        pendingNotificationNavigation = null;
+        if (!item || item.style.display === "none") {
+          reportNotificationNavigationResult(
+            pending,
+            false,
+            item ? "achievement-filtered" : "achievement-not-found",
+          );
+          window.api?.logOverlayEvent?.(
+            "info",
+            "notification-navigation:overlay-renderer-failed",
+            {
+              reason: item ? "achievement-filtered" : "achievement-not-found",
+              configName: currentConfigName || null,
+              achievementId,
+            },
+          );
+          return false;
+        }
+        clearNotificationNavigationTarget();
+        item.classList.add("notification-navigation-target");
+        notificationNavigationTargetTimer = setTimeout(() => {
+          clearNotificationNavigationTarget();
+        }, NOTIFICATION_NAVIGATION_TARGET_TIMEOUT_MS);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            try {
+              item.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+                inline: "nearest",
+              });
+            } catch {}
+          });
+        });
+        window.api?.logOverlayEvent?.(
+          "info",
+          "notification-navigation:overlay-renderer-complete",
+          {
+            configName: currentConfigName || null,
+            achievementId,
+          },
+        );
+        reportNotificationNavigationResult(pending, true);
+        return true;
+      }
+
+      function applyOverlayAchievementTableViewState(payload) {
+        const normalized = normalizeOverlayAchievementTableState(payload);
+        if (!normalized) return;
+        overlayAchievementTableViewState.status = normalized.status;
+        overlayAchievementTableViewState.nameSort = normalized.nameSort;
+        overlayAchievementTableViewState.timeSort = normalized.timeSort;
+        overlayAchievementTableViewState.raritySort = normalized.raritySort;
+        persistOverlayAchievementTableViewStateToStorage();
+        applyOverlayAchievementViewState();
+      }
+
+      hydrateOverlayAchievementTableViewStateFromStorage();
+
+      function updateStats(achievements, savedData) {
+        const total = achievements.length;
+        const unlocked = achievements.reduce((count, ach) => {
+          const saved = savedData?.achievements?.[ach.name];
+          return count + (saved?.earned ? 1 : 0);
+        }, 0);
+
+        const percentage = total > 0 ? Math.round((unlocked / total) * 100) : 0;
+        const fillEl = document.getElementById("progress-fill");
+        if (!fillEl) return;
+
+        if (percentage === 0) {
+          const prevTransition = fillEl.style.transition;
+          fillEl.style.transition = "none";
+          fillEl.style.width = "0%";
+          void fillEl.offsetWidth;
+          requestAnimationFrame(() => {
+            fillEl.style.transition = prevTransition;
+          });
+        } else {
+          fillEl.style.width = `${percentage}%`;
+        }
+
+        document
+          .getElementById("achievement-count")
+          .querySelector(".value").textContent = `${unlocked}/${total}`;
+        document.getElementById("completion-percentage").textContent =
+          `${percentage}%`;
+      }
+
+      async function loadAchievements(configName) {
+        const achievementsList = document.getElementById("achievements-list");
+        const emptyState = document.getElementById("empty-state");
+
+        if (!configName) return;
+
+        if (isLoading) {
+          pendingConfigName = configName;
+          return;
+        }
+        isLoading = true;
+        pendingConfigName = null;
+
+        try {
+          await applyOverlayLanguage();
+          const configMeta = await window.api.getConfigByName?.(configName);
+          const platformForRaritySort = String(configMeta?.platform || "")
+            .trim()
+            .toLowerCase();
+          const useTrophyTypeRaritySortFallback =
+            platformForRaritySort === "rpcs3" ||
+            platformForRaritySort === "shadps4";
+          const achievementsDataObj =
+            await window.api.loadAchievementData(configName, {
+              includeRarity: true,
+            });
+          const savedAchievementsObj =
+            await window.api.loadSavedAchievements(configName);
+          const lang = overlayLang;
+          const prefs = await loadOverlayPrefs();
+          const trophyModeEnabled = prefs?.trophyModeEnabled === true;
+
+          if (!Array.isArray(achievementsDataObj.achievements)) {
+            emptyState.style.display = "flex";
+            achievementsList.style.display = "none";
+            updateStats([], null);
+            document.body.classList.add("overlay-compact");
+            currentConfigName = configName;
+            currentDataHash = null;
+            return;
+          }
+
+          const newHash = computeAchievementsHash(
+            achievementsDataObj.achievements,
+            savedAchievementsObj,
+            lang,
+          );
+          if (pendingConfigName && pendingConfigName !== configName) return;
+
+          const isSameConfig = currentConfigName === configName;
+          const isSameHash = currentDataHash === newHash;
+          if (isSameConfig && isSameHash) {
+            flushPendingNotificationNavigation();
+            return;
+          }
+
+          emptyState.style.display = "none";
+          achievementsList.style.display = "block";
+          achievementsList.innerHTML = "";
+          document.body.classList.remove("overlay-compact");
+
+          const uniqueAchievements = new Set();
+          const achievements = [];
+
+          achievementsDataObj.achievements.forEach((achievement) => {
+            if (!achievement.name || uniqueAchievements.has(achievement.name))
+              return;
+            uniqueAchievements.add(achievement.name);
+            achievements.push(achievement);
+          });
+
+          // Update stats
+          updateStats(achievements, savedAchievementsObj);
+
+          // Sort achievements: unlocked first, then locked
+          achievements.sort((a, b) => {
+            const aUnlocked = savedAchievementsObj?.achievements?.[a.name]
+              ?.earned
+              ? 1
+              : 0;
+            const bUnlocked = savedAchievementsObj?.achievements?.[b.name]
+              ?.earned
+              ? 1
+              : 0;
+            return bUnlocked - aUnlocked;
+          });
+
+          let defaultItemIndex = 0;
+          achievements.forEach((achievement) => {
+            const displayName = getSafeLocalizedText(
+              achievement.displayName,
+              lang,
+            );
+            const description = getSafeLocalizedText(
+              achievement.description,
+              lang,
+            );
+            const iconGray = achievement.icon_gray || achievement.icongray;
+            const icon = achievement.icon || iconGray;
+            const isHidden = Number(achievement.hidden) === 1;
+
+            let statusHTML = `<div class="status-locked">${faWithFallback(
+              "fas fa-lock",
+              "🔒",
+            )} ${tUi(
+              "overlay.statusLocked",
+              "Locked",
+            )}</div>`;
+            let earnedTimeHTML = "";
+            let progressHTML = "";
+            const trophyModeTier = trophyModeEnabled
+              ? resolveTrophyModeDisplayTier(achievement)
+              : "";
+            const trophyModeLabel = trophyModeEnabled
+              ? getTrophyModeTierLabel(trophyModeTier)
+              : "";
+            const rarityText = formatRarityPercent(achievement, {
+              includeNativeTrophyType: !trophyModeEnabled,
+            });
+            const trophyModeHTML = trophyModeLabel
+              ? ` · <span class="trophy-tier-label trophy-tier-${trophyModeTier}">${trophyModeLabel}</span>`
+              : "";
+            const rarityHTML = `<div class="achievement-rarity">${tUi("overlay.rarityLabel", "Rarity")}: ${rarityText}${trophyModeHTML}</div>`;
+            const saved =
+              savedAchievementsObj?.achievements?.[achievement.name];
+            const isUnlocked = !!saved?.earned;
+            const rel = isUnlocked ? icon : iconGray;
+            const showHidden = prefs?.showHiddenDescription === true;
+            const effectiveProgress = getEffectiveAchievementProgress(saved);
+            const isDescriptionMasked = isHidden && !isUnlocked && !showHidden;
+            const hiddenLabel = tUi("overlay.hiddenFallback", "Hidden");
+            const hasDescription =
+              typeof achievement.description === "string"
+                ? achievement.description.trim().length > 0
+                : achievement.description &&
+                  typeof achievement.description === "object" &&
+                  Object.values(achievement.description).some(
+                    (value) => typeof value === "string" && value.trim().length > 0,
+                  );
+            const descText = isDescriptionMasked ? hiddenLabel : description;
+            const rarityPercentValue = resolveRarityPercent(achievement);
+
+            if (saved?.earned) {
+              statusHTML = `<div class="status-unlocked">${faWithFallback(
+                "fas fa-unlock",
+                "🔓",
+              )} ${tUi(
+                "overlay.statusUnlocked",
+                "Unlocked",
+              )}</div>`;
+              earnedTimeHTML = `<div class="achievement-time">${formatTimestamp(
+                saved.earned_time,
+              )}</div>`;
+            }
+
+            if (effectiveProgress.show) {
+              progressHTML = `
+                    <div class="achievement-progress">
+                    ${tUi("overlay.progressLabel", "Progress")}: ${effectiveProgress.progress} / ${effectiveProgress.max}
+                    <div class="progress-bar" style="margin-top: 4px; height: 4px;">
+                        <div class="progress-fill" style="width: ${effectiveProgress.percent}%;"></div>
+                    </div>
+                    </div>`;
+            }
+
+            const listItem = document.createElement("li");
+            listItem.className = "achievement-item";
+            listItem.dataset.achievementName = String(achievement.name);
+            const rarityGlowTierClass = resolveRarityGlowTierClass(
+              achievement,
+              { trophyModeEnabled },
+            );
+            listItem.dataset.defaultIndex = String(defaultItemIndex++);
+            listItem.dataset.sortName = String(
+              displayName || achievement.name || "",
+            )
+              .trim()
+              .replace(/\s+/g, " ")
+              .toLowerCase();
+            listItem.dataset.sortUnlocked = isUnlocked ? "1" : "0";
+            const earnedTimeValue = Number(saved?.earned_time);
+            listItem.dataset.sortEarnedTime =
+              Number.isFinite(earnedTimeValue) && earnedTimeValue > 0
+                ? String(earnedTimeValue)
+                : "";
+            const raritySortValue = resolveRaritySortValue(achievement, {
+              useTrophyTypeRaritySortFallback,
+            });
+            listItem.dataset.sortRarity =
+              raritySortValue === null ? "" : String(raritySortValue);
+            listItem.innerHTML = `
+          <img class="achievement-icon" alt="Icon">
+            <div class="achievement-info">
+              <div class="achievement-name">${displayName}</div>
+            <div class="achievement-description"></div>
+            ${progressHTML}
+          </div>
+          <div class="achievement-status">
+            ${statusHTML}
+            ${earnedTimeHTML}
+            ${rarityHTML}
+          </div>
+        `;
+            const descriptionEl = listItem.querySelector(
+              ".achievement-description",
+            );
+            if (isDescriptionMasked && hasDescription) {
+              const toggle = document.createElement("button");
+              toggle.type = "button";
+              toggle.className = "hidden-description-toggle";
+              toggle.textContent = hiddenLabel;
+              toggle.setAttribute("aria-pressed", "false");
+              toggle.addEventListener("click", () => {
+                const revealed = toggle.getAttribute("aria-pressed") === "true";
+                toggle.setAttribute("aria-pressed", revealed ? "false" : "true");
+                toggle.textContent = revealed ? hiddenLabel : description;
+              });
+              descriptionEl.appendChild(toggle);
+            } else {
+              descriptionEl.textContent = descText;
+            }
+            achievementsList.appendChild(listItem);
+
+            const imgEl = listItem.querySelector("img.achievement-icon");
+            if (imgEl && rarityGlowTierClass) {
+              imgEl.classList.add(rarityGlowTierClass);
+            }
+            resolveAchievementIcon(imgEl, achievementsDataObj.config_path, rel);
+          });
+          applyOverlayAchievementViewState();
+
+          currentConfigName = configName;
+          currentDataHash = newHash;
+          flushPendingNotificationNavigation();
+        } finally {
+          isLoading = false;
+          const next = pendingConfigName;
+          pendingConfigName = null;
+          if (next) {
+            loadAchievements(next);
+          } else {
+            flushPendingNotificationNavigation();
+            flushOverlayVisibilityAck("loadAchievements:finally");
+          }
+        }
+      }
+
+      window.api.onSetLanguage((payload) => {
+        let contentLanguageChanged = false;
+        let uiLanguageChanged = false;
+        if (payload && typeof payload === "object") {
+          if (payload.language) {
+            const nextOverlayLang = String(payload.language || "english");
+            contentLanguageChanged = nextOverlayLang !== overlayLang;
+            overlayLang = nextOverlayLang;
+          }
+          if (payload.uiLanguage) {
+            const nextUiLanguage = String(payload.uiLanguage || "english");
+            uiLanguageChanged = nextUiLanguage !== overlayUiLang;
+            overlayUiLang = nextUiLanguage;
+            overlayPrefs = {
+              ...(overlayPrefs || {}),
+              uiLanguage: overlayUiLang,
+            };
+            if (
+              window.i18nUi &&
+              typeof window.i18nUi.setUiLanguage === "function"
+            ) {
+              window.i18nUi.setUiLanguage(overlayUiLang);
+            }
+          }
+        } else {
+          const nextOverlayLang = String(payload || "english");
+          contentLanguageChanged = nextOverlayLang !== overlayLang;
+          overlayLang = nextOverlayLang;
+        }
+        if (uiLanguageChanged || contentLanguageChanged) {
+          currentDataHash = null;
+        }
+        if (currentConfigName && (uiLanguageChanged || contentLanguageChanged)) {
+          loadAchievements(currentConfigName);
+        }
+      });
+
+      window.api.onLoadOverlayData((configName) => {
+        const achievementsList = document.getElementById("achievements-list");
+        const emptyState = document.getElementById("empty-state");
+
+        if (!configName) {
+          clearNotificationNavigationTarget();
+          pendingNotificationNavigation = null;
+          achievementsList.innerHTML = "";
+          emptyState.style.display = "flex";
+          achievementsList.style.display = "none";
+          updateStats([], null);
+          document.body.classList.add("overlay-compact");
+          currentConfigName = null;
+          currentDataHash = null;
+          pendingConfigName = null;
+          isLoading = false;
+          return;
+        }
+
+        if (configName !== currentConfigName) {
+          clearNotificationNavigationTarget();
+          currentDataHash = null;
+        }
+        currentConfigName = configName;
+        pendingConfigName = null;
+
+        loadAchievements(configName);
+      });
+
+      window.api.onRefreshAchievementsTable(() => {
+        if (currentConfigName) {
+          loadAchievements(currentConfigName);
+        }
+      });
+
+      window.api.on("ach-table:view-state", (payload) => {
+        applyOverlayAchievementTableViewState(payload);
+      });
+
+      window.api.on("overlay:navigate-achievement", (payload) => {
+        if (!payload || typeof payload !== "object") return;
+        pendingNotificationNavigation = {
+          requestId: String(payload.requestId || ""),
+          configName: String(payload.configName || ""),
+          achievementId: String(payload.achievementId || ""),
+        };
+        flushPendingNotificationNavigation();
+      });
+      window.api.overlayNavigationReady?.();
+
+      window.api.on("overlay-preferences-updated", (payload) => {
+        if (!payload || typeof payload !== "object") return;
+        if (Object.prototype.hasOwnProperty.call(payload, "appTheme")) {
+          registerOverlayThemes(payload);
+          overlayPrefs = {
+            ...(overlayPrefs || {}),
+            appTheme: normalizeAppTheme(payload.appTheme),
+          };
+          overlayPrefsLoaded = true;
+          applyAppTheme(overlayPrefs.appTheme);
+        }
+        if (
+          Object.prototype.hasOwnProperty.call(payload, "showHiddenDescription")
+        ) {
+          overlayPrefs = {
+            ...(overlayPrefs || {}),
+            showHiddenDescription: payload.showHiddenDescription === true,
+          };
+          overlayPrefsLoaded = true;
+          currentDataHash = null;
+          if (currentConfigName) {
+            loadAchievements(currentConfigName);
+          }
+        }
+        if (Object.prototype.hasOwnProperty.call(payload, "trophyModeEnabled")) {
+          overlayPrefs = {
+            ...(overlayPrefs || {}),
+            trophyModeEnabled: payload.trophyModeEnabled === true,
+          };
+          overlayPrefsLoaded = true;
+          currentDataHash = null;
+          if (currentConfigName) {
+            loadAchievements(currentConfigName);
+          }
+        }
+      });
+
+      function setOverlayVisible(visible, source = null) {
+        document.body.classList.toggle("overlay-hidden", !visible);
+        const ackPayload = {
+          visible: !!visible,
+          source: source || null,
+        };
+        try {
+          window.api?.logOverlayEvent?.(
+            "debug",
+            "overlay:renderer:set-visible",
+            {
+              ...ackPayload,
+              cssHidden: document.body.classList.contains("overlay-hidden"),
+              documentHidden: !!document.hidden,
+              deferred: !!visible && isLoading,
+            },
+          );
+        } catch {}
+        if (visible && isLoading) {
+          pendingVisibilityAckPayload = ackPayload;
+          return;
+        }
+        pendingVisibilityAckPayload = null;
+        dispatchOverlayVisibilityAck(ackPayload, "setOverlayVisible");
+      }
+
+      window.api.on("overlay:set-visible", (payload) => {
+        const visible =
+          payload && typeof payload === "object" ? payload.visible : payload;
+        const source =
+          payload && typeof payload === "object" && payload.source
+            ? String(payload.source)
+            : null;
+        setOverlayVisible(!!visible, source);
+      });
+
+      function setupOverlayDrag() {
+        const dragHandle = document.querySelector(".overlay-header");
+        if (!dragHandle) return;
+        if (
+          !window.api ||
+          typeof window.api.getWindowPosition !== "function" ||
+          typeof window.api.setWindowPosition !== "function" ||
+          typeof window.api.startOverlayDrag !== "function" ||
+          typeof window.api.endOverlayDrag !== "function"
+        ) {
+          return;
+        }
+
+        let dragActive = false;
+
+        const endDrag = () => {
+          if (!dragActive) return;
+          dragActive = false;
+          window.api.endOverlayDrag();
+          try {
+            window.removeEventListener("mouseup", endDrag, true);
+            document.removeEventListener("mouseup", endDrag, true);
+          } catch {}
+        };
+
+        const startDrag = async (event) => {
+          if (event.button !== 0) return;
+          event.preventDefault();
+          if (dragActive) return;
+
+          let winX = Number(window.screenX);
+          let winY = Number(window.screenY);
+          try {
+            const pos = await window.api.getWindowPosition();
+            if (Array.isArray(pos) && pos.length >= 2) {
+              const px = Number(pos[0]);
+              const py = Number(pos[1]);
+              if (Number.isFinite(px) && Number.isFinite(py)) {
+                winX = px;
+                winY = py;
+              }
+            }
+          } catch {}
+
+          if (!Number.isFinite(winX) || !Number.isFinite(winY)) return;
+
+          const sx = Number(event.screenX);
+          const sy = Number(event.screenY);
+          const cx = Number(event.clientX);
+          const cy = Number(event.clientY);
+          const screenX = Number.isFinite(sx) ? sx : winX + cx;
+          const screenY = Number.isFinite(sy) ? sy : winY + cy;
+
+          if (!Number.isFinite(screenX) || !Number.isFinite(screenY)) return;
+
+          const offsetX = screenX - winX;
+          const offsetY = screenY - winY;
+          if (!Number.isFinite(offsetX) || !Number.isFinite(offsetY)) return;
+
+          dragActive = true;
+          window.api.startOverlayDrag({ offsetX, offsetY });
+          window.addEventListener("mouseup", endDrag, true);
+          document.addEventListener("mouseup", endDrag, true);
+        };
+
+        dragHandle.addEventListener("mousedown", startDrag, true);
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) endDrag();
+        });
+      }
+
+      function setupOverlayKeyboardScroll() {
+        if (!window.api || typeof window.api.on !== "function") return;
+        const container = document.querySelector(".overlay-container");
+        if (!container) return;
+
+        window.api.on("overlay:scroll-page", (payload) => {
+          const dir =
+            payload && typeof payload === "object"
+              ? payload.direction
+              : payload;
+          const direction = String(dir || "").toLowerCase();
+          const page = Math.max(120, Math.round(container.clientHeight * 0.85));
+          if (direction === "up") {
+            container.scrollBy({ top: -page, behavior: "smooth" });
+            return;
+          }
+          if (direction === "down") {
+            container.scrollBy({ top: page, behavior: "smooth" });
+          }
+        });
+      }
+
+      function setupOverlayDragRegion() {
+        if (
+          !window.api ||
+          typeof window.api.setOverlayDragRegionHeight !== "function"
+        ) {
+          return;
+        }
+        const top = document.querySelector(".overlay-top");
+        if (!top) return;
+
+        const sendHeight = () => {
+          const rect = top.getBoundingClientRect();
+          if (rect && rect.height) {
+            window.api.setOverlayDragRegionHeight(Math.round(rect.height));
+          }
+        };
+
+        try {
+          const ro = new ResizeObserver(() => sendHeight());
+          ro.observe(top);
+        } catch {
+          window.addEventListener("resize", sendHeight);
+        }
+
+        sendHeight();
+      }
+
+      window.onload = () => {
+        window.api.requestCurrentConfig?.();
+        setupOverlayKeyboardScroll();
+        setupOverlayDragRegion();
+      };
+    </script>
+  </body>
+</html>

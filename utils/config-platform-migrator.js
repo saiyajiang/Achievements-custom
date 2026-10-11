@@ -1,0 +1,564 @@
+const fs = require("fs");
+const path = require("path");
+
+const VALID_PLATFORMS = new Set([
+  "steam",
+  "steam-official",
+  "uplay",
+  "ubisoft-official",
+  "ea-official",
+  "epic",
+  "epic-official",
+  "gog",
+  "gog-official",
+  "xbox-pc",
+  "retroachievements",
+  "xenia",
+  "rpcs3",
+  "shadps4",
+  "markerpatch",
+  "madnesspatch",
+  "xlivelessness",
+]);
+
+function normalizePlatform(value) {
+  const raw = String(value || "")
+    .trim()
+    .toLowerCase();
+  return VALID_PLATFORMS.has(raw) ? raw : "";
+}
+
+function sanitizeAppId(value) {
+  const raw = String(value || "").trim();
+  return /^[0-9a-fA-F]+$/.test(raw) ? raw : "";
+}
+
+function sanitizeEpicOfficialAppId(value) {
+  const raw = String(value || "").trim();
+  return /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(raw) ? raw : "";
+}
+
+function sanitizeXboxPcTitleId(value) {
+  const raw = String(value || "").trim();
+  return /^\d{1,20}$/.test(raw) ? raw : "";
+}
+
+function sanitizeRetroAchievementsGameId(value) {
+  const raw = String(value || "").trim();
+  return /^\d{1,12}$/.test(raw) && Number(raw) > 0 ? raw : "";
+}
+
+function sanitizeAppIdForPlatform(value, platform) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const normalized = normalizePlatform(platform);
+  if (normalized === "epic-official") {
+    return sanitizeEpicOfficialAppId(raw);
+  }
+  if (normalized === "xbox-pc") {
+    return sanitizeXboxPcTitleId(raw);
+  }
+  if (normalized === "retroachievements") {
+    return sanitizeRetroAchievementsGameId(raw);
+  }
+  if (normalized === "rpcs3") {
+    // Trophy set ids like NPWR12345_00
+    return /^NP[A-Z0-9_]+$/i.test(raw) ? raw : "";
+  }
+  if (normalized === "shadps4") {
+    return /^CUSA[0-9]+$/i.test(raw) || /^NP[A-Z0-9_]+$/i.test(raw)
+      ? raw
+      : "";
+  }
+  if (normalized === "xenia") {
+    if (/^0x[0-9a-f]+$/i.test(raw)) return raw.slice(2);
+    if (/^[0-9a-f]+$/i.test(raw)) return raw;
+    return raw;
+  }
+  if (normalized === "xlivelessness") {
+    return /^[0-9a-f]{8}$/i.test(raw) ? raw.toUpperCase() : "";
+  }
+  return sanitizeAppId(raw);
+}
+
+function inferOfficialPlatformFromMarkers(config = {}) {
+  const configPath = String(config?.config_path || "").trim().toLowerCase();
+  const schemaNeedle = `${path.sep}schema${path.sep}`;
+  if (configPath.includes(`${schemaNeedle}steam-official${path.sep}`)) {
+    return "steam-official";
+  }
+  if (configPath.includes(`${schemaNeedle}gog-official${path.sep}`)) {
+    return "gog-official";
+  }
+  if (configPath.includes(`${schemaNeedle}ubisoft-official${path.sep}`)) {
+    return "ubisoft-official";
+  }
+  if (configPath.includes(`${schemaNeedle}ea-official${path.sep}`)) {
+    return "ea-official";
+  }
+  if (configPath.includes(`${schemaNeedle}epic-official${path.sep}`)) {
+    return "epic-official";
+  }
+  if (configPath.includes(`${schemaNeedle}xbox-pc${path.sep}`)) {
+    return "xbox-pc";
+  }
+  if (configPath.includes(`${schemaNeedle}retroachievements${path.sep}`)) {
+    return "retroachievements";
+  }
+  if (configPath.includes(`${schemaNeedle}markerpatch${path.sep}`)) {
+    return "markerpatch";
+  }
+  if (configPath.includes(`${schemaNeedle}madnesspatch${path.sep}`)) {
+    return "madnesspatch";
+  }
+  if (configPath.includes(`${schemaNeedle}xlivelessness${path.sep}`)) {
+    return "xlivelessness";
+  }
+
+  // Emulator configs can carry the same catalog identifiers as Epic Official.
+  if (normalizePlatform(config?.platform) === "epic") return "";
+
+  const hasEpicOfficialProductMarker = Boolean(
+    config?.epic_product_id || config?.epicProductId,
+  );
+  const hasEpicOfficialNamespaceMarker = Boolean(
+    config?.epic_namespace || config?.epicNamespace,
+  );
+  const hasEpicOfficialAccountMarker = Boolean(
+    config?.epic_account_id || config?.epicAccountId,
+  );
+  const hasEpicOfficialCatalogMarker = Boolean(
+    config?.epic_catalog_item_id || config?.epicCatalogItemId,
+  );
+  const hasEpicOfficialAppMarker = Boolean(
+    config?.epic_app_name || config?.epicAppName,
+  );
+  const hasEpicOfficialIdentityMarker =
+    hasEpicOfficialProductMarker || hasEpicOfficialNamespaceMarker;
+  if (
+    (hasEpicOfficialAccountMarker && hasEpicOfficialIdentityMarker) ||
+    (hasEpicOfficialIdentityMarker &&
+      (hasEpicOfficialCatalogMarker || hasEpicOfficialAppMarker))
+  ) {
+    return "epic-official";
+  }
+  if (config?.gog_gameplay_db || config?.gog_client_id || config?.gog_user_id) {
+    return "gog-official";
+  }
+  if (config?.ubisoft_spool_file) {
+    return "ubisoft-official";
+  }
+  if (config?.ea_log_file) {
+    return "ea-official";
+  }
+  if (
+    config?.xbox_title_id ||
+    config?.xbox_xuid ||
+    config?.xbox_package_family_name ||
+    config?.xbox_aumid
+  ) {
+    return "xbox-pc";
+  }
+  if (
+    config?.retroachievements_game_id ||
+    config?.retroachievements_ulid ||
+    config?.retroachievements_username
+  ) {
+    return "retroachievements";
+  }
+  if (
+    config?.markerpatch_state_file ||
+    String(config?.achievement_source?.provider || "").toLowerCase() ===
+      "markerpatch"
+  ) {
+    return "markerpatch";
+  }
+  if (
+    config?.madnesspatch_checkpoint_root ||
+    String(config?.achievement_source?.provider || "").toLowerCase() ===
+      "madnesspatch"
+  ) {
+    return "madnesspatch";
+  }
+  if (
+    config?.xlln_title_id ||
+    config?.xlln_title_config_path ||
+    String(config?.achievement_source?.provider || "").toLowerCase() ===
+      "xlivelessness"
+  ) {
+    return "xlivelessness";
+  }
+  return "";
+}
+
+function inferPlatformAndSteamId({ config, mapping }) {
+  const currentPlatform = normalizePlatform(config.platform);
+  const markerPlatform = inferOfficialPlatformFromMarkers(config);
+  const rawAppId = config.appid || config.appId || config.steamAppId;
+  const appid =
+    sanitizeAppIdForPlatform(rawAppId, currentPlatform) ||
+    sanitizeAppId(config.appid) ||
+    sanitizeAppId(config.appId) ||
+    sanitizeAppId(config.steamAppId);
+  let steamAppId = sanitizeAppId(config.steamAppId);
+  let platform = markerPlatform || currentPlatform;
+
+  const mappedSteamId =
+    mapping && mapping.steam_appid ? sanitizeAppId(mapping.steam_appid) : "";
+
+  if (!platform) {
+    if (steamAppId && appid && steamAppId !== appid) {
+      platform = "uplay";
+    } else if (mappedSteamId && appid && mappedSteamId !== appid) {
+      platform = "uplay";
+      steamAppId = mappedSteamId;
+    } else {
+      platform = "steam";
+      if (steamAppId === appid) steamAppId = "";
+    }
+  } else if (platform === "uplay") {
+    if (!steamAppId && mappedSteamId && mappedSteamId !== appid) {
+      steamAppId = mappedSteamId;
+    }
+  } else if (platform === "ubisoft-official") {
+    if (!steamAppId && mappedSteamId && mappedSteamId !== appid) {
+      steamAppId = mappedSteamId;
+    }
+  } else if (platform === "ea-official") {
+    steamAppId = "";
+  } else if (platform === "steam") {
+    if (steamAppId && (!appid || steamAppId === appid)) {
+      steamAppId = "";
+    }
+  } else if (
+    platform === "epic" ||
+    platform === "epic-official" ||
+    platform === "gog" ||
+    platform === "gog-official" ||
+    platform === "xbox-pc" ||
+    platform === "retroachievements" ||
+    platform === "markerpatch" ||
+    platform === "madnesspatch" ||
+    platform === "xlivelessness"
+  ) {
+    steamAppId = "";
+  } else if (platform === "xenia" || platform === "rpcs3") {
+    steamAppId = "";
+  }
+
+  return {
+    platform,
+    steamAppId,
+    appid,
+  };
+}
+
+function migrateConfigPlatforms({
+  configsDir,
+  mappingByUplayId,
+  logger = console,
+}) {
+  let updated = 0;
+  const platformIndex = new Map(); // appid -> Set(platform)
+
+  let files = [];
+  try {
+    files = fs
+      .readdirSync(configsDir)
+      .filter((name) => name.toLowerCase().endsWith(".json"));
+  } catch (err) {
+    logger?.warn?.("platform-migrate:list-failed", { error: err.message });
+    return { updated: 0, platformIndex };
+  }
+
+  for (const file of files) {
+    const full = path.join(configsDir, file);
+    let data;
+    try {
+      data = JSON.parse(fs.readFileSync(full, "utf8"));
+    } catch (err) {
+      logger?.warn?.("platform-migrate:parse-failed", {
+        file: full,
+        error: err.message,
+      });
+      continue;
+    }
+
+    const rawAppId = String(
+      data.appid || data.appId || data.steamAppId || "",
+    ).trim();
+    const normalizedPlatform = normalizePlatform(data.platform);
+    const appid =
+      sanitizeAppIdForPlatform(rawAppId, normalizedPlatform) ||
+      sanitizeAppId(rawAppId) ||
+      (normalizedPlatform === "rpcs3" ? rawAppId : "");
+    const mapping = appid ? mappingByUplayId.get(appid) : null;
+    const { platform, steamAppId } = inferPlatformAndSteamId({
+      config: data,
+      mapping,
+    });
+
+    const nextSteamAppId = steamAppId || undefined;
+    const nextPlatform = platform || undefined;
+    const prevSteamAppId =
+      data.steamAppId !== undefined ? String(data.steamAppId) : undefined;
+    const prevPlatform = data.platform;
+
+    const needsUpdate =
+      nextPlatform !== prevPlatform ||
+      nextSteamAppId !== prevSteamAppId ||
+      !VALID_PLATFORMS.has(normalizePlatform(prevPlatform));
+
+    if (needsUpdate) {
+      if (nextPlatform) data.platform = nextPlatform;
+      else delete data.platform;
+
+      if (nextSteamAppId) data.steamAppId = nextSteamAppId;
+      else delete data.steamAppId;
+
+      try {
+        fs.writeFileSync(full, JSON.stringify(data, null, 2));
+        updated++;
+      } catch (err) {
+        logger?.warn?.("platform-migrate:write-failed", {
+          file: full,
+          error: err.message,
+        });
+      }
+    }
+
+    const finalPlatform = normalizePlatform(data.platform) || "steam";
+    const indexAppId =
+      sanitizeAppIdForPlatform(rawAppId, finalPlatform) ||
+      sanitizeAppId(rawAppId) ||
+      (finalPlatform === "rpcs3" ? rawAppId : "") ||
+      (finalPlatform === "shadps4" ? rawAppId : "");
+    if (indexAppId) {
+      if (!platformIndex.has(indexAppId))
+        platformIndex.set(indexAppId, new Set());
+      platformIndex.get(indexAppId).add(finalPlatform);
+    }
+  }
+
+  return { updated, platformIndex };
+}
+
+function migrateSchemaStorage({ configsDir, platformIndex, logger = console }) {
+  const schemaRoot = path.join(configsDir, "schema");
+  let moved = 0;
+  let updatedConfigs = 0;
+  try {
+    if (!fs.existsSync(schemaRoot)) {
+      return { moved, updatedConfigs };
+    }
+  } catch {
+    return { moved, updatedConfigs };
+  }
+
+  const legacyDirs = [];
+  try {
+    const entries = fs.readdirSync(schemaRoot, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const name = entry.name;
+      const normalized = name.trim().toLowerCase();
+      if (VALID_PLATFORMS.has(normalized)) continue;
+      if (!/^\d+$/.test(name)) continue;
+      legacyDirs.push(name);
+    }
+  } catch (err) {
+    logger?.warn?.("platform-migrate:schema-enumerate-failed", {
+      error: err?.message || String(err),
+    });
+  }
+
+  for (const dir of legacyDirs) {
+    const appid = dir;
+    const currentDir = path.join(schemaRoot, dir);
+    const platforms = platformIndex?.get(appid);
+    const prefersUplay = platforms?.has("uplay") && !platforms?.has("steam");
+    const prefersGogOfficial =
+      platforms?.has("gog-official") &&
+      !platforms?.has("steam") &&
+      !platforms?.has("uplay") &&
+      !platforms?.has("gog");
+    const prefersGog =
+      platforms?.has("gog") &&
+      !platforms?.has("steam") &&
+      !platforms?.has("uplay");
+    const prefersEaOfficial =
+      platforms?.has("ea-official") &&
+      !platforms?.has("steam") &&
+      !platforms?.has("uplay") &&
+      !platforms?.has("gog") &&
+      !platforms?.has("epic");
+    const prefersEpicOfficial =
+      platforms?.has("epic-official") &&
+      !platforms?.has("steam") &&
+      !platforms?.has("uplay") &&
+      !platforms?.has("gog") &&
+      !platforms?.has("epic");
+    const prefersXboxPc =
+      platforms?.has("xbox-pc") &&
+      !platforms?.has("steam") &&
+      !platforms?.has("uplay") &&
+      !platforms?.has("gog") &&
+      !platforms?.has("epic");
+    const prefersRetroAchievements =
+      platforms?.has("retroachievements") &&
+      !platforms?.has("steam") &&
+      !platforms?.has("uplay") &&
+      !platforms?.has("gog") &&
+      !platforms?.has("epic");
+    const prefersMarkerPatch =
+      platforms?.has("markerpatch") &&
+      !platforms?.has("steam") &&
+      !platforms?.has("uplay") &&
+      !platforms?.has("gog") &&
+      !platforms?.has("epic");
+    const prefersMadnessPatch =
+      platforms?.has("madnesspatch") &&
+      !platforms?.has("steam") &&
+      !platforms?.has("uplay") &&
+      !platforms?.has("gog") &&
+      !platforms?.has("epic");
+    const prefersXLiveLessNess =
+      platforms?.has("xlivelessness") &&
+      !platforms?.has("steam") &&
+      !platforms?.has("uplay") &&
+      !platforms?.has("gog") &&
+      !platforms?.has("epic");
+    const targetPlatform = prefersUplay
+      ? "uplay"
+      : prefersGogOfficial
+        ? "gog-official"
+      : prefersEaOfficial
+        ? "ea-official"
+      : prefersEpicOfficial
+        ? "epic-official"
+      : prefersXboxPc
+        ? "xbox-pc"
+      : prefersRetroAchievements
+        ? "retroachievements"
+      : prefersMarkerPatch
+          ? "markerpatch"
+      : prefersMadnessPatch
+          ? "madnesspatch"
+        : prefersXLiveLessNess
+          ? "xlivelessness"
+          : prefersGog
+            ? "gog"
+            : "steam";
+    const targetDir = path.join(schemaRoot, targetPlatform, appid);
+    try {
+      if (fs.existsSync(targetDir)) {
+        // Already migrated or conflicting folder; skip to avoid data loss.
+        continue;
+      }
+      fs.mkdirSync(path.dirname(targetDir), { recursive: true });
+      fs.renameSync(currentDir, targetDir);
+      moved++;
+    } catch (err) {
+      logger?.warn?.("platform-migrate:schema-move-failed", {
+        appid,
+        targetPlatform,
+        source: currentDir,
+        target: targetDir,
+        error: err?.message || String(err),
+      });
+    }
+  }
+
+  try {
+    const files = fs
+      .readdirSync(configsDir)
+      .filter((name) => name.toLowerCase().endsWith(".json"));
+    for (const file of files) {
+      const full = path.join(configsDir, file);
+      let data;
+      try {
+        data = JSON.parse(fs.readFileSync(full, "utf8"));
+      } catch {
+        continue;
+      }
+      const platform = normalizePlatform(data?.platform) || "steam";
+      const appid =
+        sanitizeAppIdForPlatform(data?.appid, platform) ||
+        sanitizeAppId(data?.appid) ||
+        sanitizeAppId(data?.appId) ||
+        sanitizeAppId(data?.steamAppId);
+      if (!appid) continue;
+    const storagePlatform =
+      platform === "uplay"
+        ? "uplay"
+        : platform === "ubisoft-official"
+          ? "ubisoft-official"
+        : platform === "ea-official"
+          ? "ea-official"
+        : platform === "gog"
+            ? "gog"
+            : platform === "epic"
+              ? "epic"
+              : platform === "epic-official"
+                ? "epic-official"
+              : platform === "gog-official"
+                ? "gog-official"
+              : platform === "xbox-pc"
+                ? "xbox-pc"
+              : platform === "retroachievements"
+                ? "retroachievements"
+              : platform === "xenia"
+                ? "xenia"
+                : platform === "rpcs3"
+                  ? "rpcs3"
+                  : platform === "shadps4"
+                    ? "shadps4"
+                    : platform === "markerpatch"
+                      ? "markerpatch"
+                    : platform === "madnesspatch"
+                      ? "madnesspatch"
+                    : platform === "xlivelessness"
+                      ? "xlivelessness"
+                      : "steam";
+      const legacyDir = path.join(schemaRoot, appid);
+      const nextDir = path.join(schemaRoot, storagePlatform, appid);
+      const currentPath =
+        typeof data?.config_path === "string" ? data.config_path : "";
+      if (
+        currentPath &&
+        path.normalize(currentPath).toLowerCase() ===
+          path.normalize(legacyDir).toLowerCase()
+      ) {
+        try {
+          fs.mkdirSync(nextDir, { recursive: true });
+        } catch {}
+        data.config_path = nextDir;
+        try {
+          fs.writeFileSync(full, JSON.stringify(data, null, 2));
+          updatedConfigs++;
+        } catch (err) {
+          logger?.warn?.("platform-migrate:schema-config-update-failed", {
+            file: full,
+            error: err?.message || String(err),
+          });
+        }
+      }
+    }
+  } catch (err) {
+    logger?.warn?.("platform-migrate:schema-config-scan-failed", {
+      error: err?.message || String(err),
+    });
+  }
+
+  return { moved, updatedConfigs };
+}
+
+module.exports = {
+  migrateConfigPlatforms,
+  normalizePlatform,
+  sanitizeAppId,
+  sanitizeAppIdForPlatform,
+  inferOfficialPlatformFromMarkers,
+  inferPlatformAndSteamId,
+  migrateSchemaStorage,
+};
