@@ -11,6 +11,8 @@
 | 文件 | 改动 | 原因 |
 |---|---|---|
 | `package.json` → `build.publish.owner` | `PSerban93` → `saiyajiang` | 不改的话客户端会去**上游仓库**拉更新，等于把更新通道交给别人 |
+| `package.json` → `build.publish.repo` | `Achievements` → `Achievements-custom` | 更新通道指向本 fork 仓库，GitHub Releases 版本控制生效 |
+| `package.json` → `version` | `1.3.1-beta.2` → `0.0.1` | 版本号从零开始计数，脱离上游版本序列 |
 | `package.json` → `build.appId` | `com.achievements.app` → `com.saiyajiang.achievements` | 避免与上游安装包冲突 |
 | `package.json` → `build.copyright` | 保留 `Copyright © 2025 JokerVerse`，追加 fork 维护者说明 | MIT 要求保留原版权声明 |
 | `README.md` | 顶部新增声明：个人自用 fork、非官方发布、改动由 AI 完成 | 避免他人误以为是官方版本 |
