@@ -16,6 +16,9 @@
 | `package.json` → `build.appId` | `com.achievements.app` → `com.saiyajiang.achievements` | 避免与上游安装包冲突 |
 | `package.json` → `build.copyright` | 保留 `Copyright © 2025 JokerVerse`，追加 fork 维护者说明 | MIT 要求保留原版权声明 |
 | `README.md` | 顶部新增声明：个人自用 fork、非官方发布、改动由 AI 完成 | 避免他人误以为是官方版本 |
+| `main.js` | changelog 服务 `owner/repo` → `saiyajiang/Achievements-custom` | 否则设置页更新日志会去**上游仓库**拉 GitHub Releases |
+| `index.html` | 设置页 GitHub 链接、文档站链接 → 本 fork 仓库及中文文档站 | 避免外链跳转到上游 |
+| `utils/github-changelog-service.js` | 默认 `owner/repo` → `saiyajiang/Achievements-custom` | 兜底默认值，防止未传参时指向上游 |
 
 ## 待办（需要时再处理）
 

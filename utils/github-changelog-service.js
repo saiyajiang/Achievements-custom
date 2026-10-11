@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 const fs = require("fs");
 const path = require("path");
@@ -35,8 +35,8 @@ function hasNextPage(linkHeader) {
 function createGitHubChangelogService(options = {}) {
   const httpClient = options.httpClient;
   const cachePath = path.resolve(String(options.cachePath || ""));
-  const owner = String(options.owner || "PSerban93");
-  const repo = String(options.repo || "Achievements");
+  const owner = String(options.owner || "saiyajiang");
+  const repo = String(options.repo || "Achievements-custom");
   const logger = options.logger || null;
   const cacheTtlMs = Math.max(
     60000,

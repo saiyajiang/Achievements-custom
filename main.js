@@ -430,8 +430,8 @@ const dashboardSummaryStore = createDashboardSummaryStore({
 const changelogService = createGitHubChangelogService({
   httpClient: axios,
   cachePath: path.join(cacheDir, "github-releases.json"),
-  owner: "PSerban93",
-  repo: "Achievements",
+  owner: "saiyajiang",
+  repo: "Achievements-custom",
   logger: updateLogger,
 });
 const settingsLogViewer = createLogViewerService({
