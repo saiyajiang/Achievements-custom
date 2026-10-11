@@ -19,21 +19,21 @@
 | `main.js` | changelog 服务 `owner/repo` → `saiyajiang/Achievements-custom` | 否则设置页更新日志会去**上游仓库**拉 GitHub Releases |
 | `index.html` | 设置页 GitHub 链接、文档站链接 → 本 fork 仓库及中文文档站 | 避免外链跳转到上游 |
 | `utils/github-changelog-service.js` | 默认 `owner/repo` → `saiyajiang/Achievements-custom` | 兜底默认值，防止未传参时指向上游 |
+| `windows-signing-policy.json` | 上游证书指纹 → 本机自签证书（`CN=saiyajiang`） | 彻底脱离上游证书依赖，签名/校验走自己的证书 |
+| `.github/FUNDING.yml` | 已删除 | 移除赞助入口，原作者信息仅在 README 保留 |
+| `README.md` | 新增「遗留项与待改进」章节 | 记录仍保留上游实现的部分，后续按需改进 |
+| `build-windows.workflow.yml` | 转 UTF-8 BOM | 解决 Windows 本地 PowerShell 读取中文乱码（文件本身 UTF-8 正常） |
 
 ## 待办（需要时再处理）
 
-**1. Windows 签名策略：`windows-signing-policy.json`**
+**1. ~~Windows 签名策略~~（已解决）**
 
-该文件仍绑定上游作者的证书指纹：
-
-- `certificateStoreSha1: 101E5C39...`
-- `allowedCertificateSha256: ["503FA527..."]`
-
-- **开发/自用（`npm start`）**：不受影响，签名校验只在 `app.isPackaged` 为 true 时启用。
-- **若要打包分发**：原作者私钥你拿不到，必须用下面两种方式之一：
-  - `npm run dist:unsigned`（关闭签名，最省事）
-  - `npm run dist:self-signed`（生成本机自签证书），随后同步把新证书指纹写回 `windows-signing-policy.json`
-- ⚠️ 注意：不要清空 `allowedCertificateSha256`。运行时校验会直接抛 `No valid Windows signing certificate pins configured`。
+`windows-signing-policy.json` 已改用本机自签证书（`CN=saiyajiang`）：
+- `certificateStoreSha1: 8291402EE03B9112F38E8DC85A5EF5ABCDB614B7`
+- `allowedCertificateSha256: ["03E4493A912A6EAF8ECB4A53C1E367D15BB073C97311EDC8C640913EEAFEC6BD"]`
+- 打包分发用 `npm run dist:self-signed`（会校验证书匹配策略文件）
+- ⚠️ 自签证书有效期至 **2031-10-12**，到期需重新生成 `New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=saiyajiang"` 并同步更新策略文件；换机器打包也需把证书导出导入
+- 对外分发仍会提示"未知发布者"，属自签正常现象
 
 **2. `build.win.requestedExecutionLevel: "requireAdministrator"`**
 

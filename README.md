@@ -11,6 +11,18 @@
 >
 > 📖 **完整使用文档（中文）**：<https://saiyajiang.github.io/Achievements-custom/> （源码见本仓库 [`docs/`](docs/index.html) 目录）
 
+## 📌 遗留项与待改进
+
+以下内容仍保留上游实现，后续按需改进：
+
+| 项 | 现状 | 后续计划 |
+|---|---|---|
+| Uplay 游戏 ID 映射数据源 | `utils/match-uplay-steam.js` 仍从上游 `PSerban93/UPLAY_GAME_ID` 拉取映射表 | 数据仓库未 fork，暂作第三方数据源依赖；如上游停更可自维护一份 |
+| 文档站链接 | `docs/` 内部分页面保留上游项目链接 | 属正常文档引用，无需处理 |
+| 代码签名 | 已改用本机自签证书（`CN=saiyajiang`），指纹已写入 `windows-signing-policy.json`，不再依赖上游证书 | 自签证书有效期至 **2031-10-12**，到期需重新生成并同步更新策略文件 |
+| 管理员权限 | `build.win.requestedExecutionLevel` 仍为 `requireAdministrator` | 功能跑通后尝试降为 `asInvoker` 并验证浮层/快捷键 |
+| 赞助入口 | `.github/FUNDING.yml` 已移除；原作者信息与版权仅在 README 保留 | 无 |
+
 一个基于 Electron 的桌面应用，用于监控正在运行的游戏并显示成就通知，支持：
 
 - ✅ 成就解锁

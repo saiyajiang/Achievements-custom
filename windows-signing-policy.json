@@ -1,9 +1,9 @@
 {
-  "publisherName": "JokerVerse",
-  "certificateSubject": "CN=JokerVerse",
-  "certificateStoreSha1": "101E5C390CD2EC069A7F9EE07FB56B7EAE315C10",
+  "publisherName": "saiyajiang",
+  "certificateSubject": "CN=saiyajiang",
+  "certificateStoreSha1": "8291402EE03B9112F38E8DC85A5EF5ABCDB614B7",
   "allowedCertificateSha256": [
-    "503FA527B0B9BF4BF3A0D148C810BCD3B84A02E33CE912E033FF280CEA9C8DEB"
+    "03E4493A912A6EAF8ECB4A53C1E367D15BB073C97311EDC8C640913EEAFEC6BD"
   ],
   "requireTimestamp": true,
   "enforceWindowsUpdates": true
