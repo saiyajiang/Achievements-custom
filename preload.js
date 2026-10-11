@@ -604,6 +604,10 @@ ipcRenderer.on("notification-navigation:disable", () => {
 });
 
 contextBridge.exposeInMainWorld("api", {
+  // Startup language selection (fork custom)
+  getUiLanguageOptions: () => ipcRenderer.invoke("ui-language:list"),
+  selectStartupUiLanguage: (language) =>
+    ipcRenderer.send("ui-language:chosen", { language }),
   // Config management
   saveConfig: (config) => ipcRenderer.invoke("saveConfig", config),
   setConfigAchievementLanguage: (configName, language = null) =>
@@ -1162,6 +1166,7 @@ contextBridge.exposeInMainWorld("electron", {
         "generate-auto-configs",
         "blacklist:list",
         "blacklist:reset",
+        "ui-language:list",
         "ui:confirm",
         "ui:refocus",
         "achgen:get-backlog",
