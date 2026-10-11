@@ -2370,8 +2370,9 @@ const DEFAULT_PREFERENCES = {
   playtimeNotificationScale: 1,
   notificationDuration: 0,
   position: "center-bottom",
-  language: "english",
-  uiLanguage: "english",
+  language: "schinese",
+  uiLanguage: "schinese",
+  uiLanguageSelected: false,
   achievementLanguageManual: false,
   disableProgress: false,
   progressMutedConfigs: [],
@@ -30010,6 +30011,117 @@ ipcMain.on("tray:action", (_event, action) => {
   }
 });
 
+// ——— 首次运行语言选择（fork 自定义：默认简体中文，首次启动先选语言）———
+const STARTUP_UI_LANGUAGE_CHANNEL = "ui-language:chosen";
+
+function listAvailableUiLanguages() {
+  try {
+    const files = fs.readdirSync(UI_LOCALE_DIR);
+    return files
+      .filter((name) => name.endsWith(".json"))
+      .map((name) => name.replace(/\.json$/, ""))
+      .sort();
+  } catch {
+    return ["english"];
+  }
+}
+
+ipcMain.handle("ui-language:list", async () => {
+  return {
+    ok: true,
+    current: getUiLanguage(),
+    languages: listAvailableUiLanguages(),
+  };
+});
+
+function promptStartupUiLanguage() {
+  return new Promise((resolve) => {
+    let settled = false;
+    let win = null;
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      try {
+        if (win && !win.isDestroyed()) win.close();
+      } catch {}
+      try {
+        ipcMain.removeAllListeners(STARTUP_UI_LANGUAGE_CHANNEL);
+      } catch {}
+      resolve(value);
+    };
+    try {
+      win = new BrowserWindow({
+        width: 560,
+        height: 640,
+        resizable: false,
+        minimizable: false,
+        maximizable: false,
+        fullscreenable: false,
+        autoHideMenuBar: true,
+        title: "Select Language",
+        backgroundColor: "#1e1f29",
+        show: false,
+        webPreferences: {
+          preload: path.join(__dirname, "preload.js"),
+          contextIsolation: true,
+          nodeIntegration: false,
+          sandbox: false,
+        },
+      });
+    } catch (err) {
+      finish(null);
+      return;
+    }
+    ipcMain.once(STARTUP_UI_LANGUAGE_CHANNEL, (_event, payload) => {
+      const lang =
+        payload && typeof payload.language === "string"
+          ? normalizeUiLanguage(payload.language)
+          : null;
+      finish(lang || null);
+    });
+    win.once("closed", () => finish(null));
+    win.once("ready-to-show", () => {
+      try {
+        win.show();
+      } catch {}
+    });
+    win
+      .loadFile(path.join(__dirname, "lang-select.html"))
+      .catch(() => finish(null));
+  });
+}
+
+async function ensureUiLanguageSelected() {
+  try {
+    const prefs = readPrefsSafe();
+    if (prefs && prefs.uiLanguageSelected === true) return;
+    const chosen = await promptStartupUiLanguage();
+    if (chosen) {
+      updatePreferences({
+        uiLanguage: chosen,
+        language: chosen,
+        uiLanguageSelected: true,
+      });
+      cachedPreferences = mergeWithDefaultPreferences(readPrefsSafe());
+      try {
+        selectedUiLanguage = getUiLanguage();
+        globalAchievementLanguage =
+          normalizeAchievementLanguage(chosen, "english") || "english";
+        refreshActiveAchievementLanguage();
+      } catch {}
+    } else {
+      // 用户直接关闭窗口：沿用当前默认语言，并标记已询问，避免每次启动都弹
+      updatePreferences({ uiLanguageSelected: true });
+    }
+  } catch (err) {
+    try {
+      prefsLogger.warn("ui-language:onboarding-failed", {
+        error: err?.message || String(err),
+      });
+    } catch {}
+  }
+}
+
 app.whenReady().then(async () => {
   if (startupProfileRestoreResult?.recoveryRequired) {
     const restoreDir = path.join(app.getPath("userData"), ".profile-restore");
@@ -30167,6 +30279,8 @@ app.whenReady().then(async () => {
   cleanupOrphanedSanPresetPreviews();
   copyProgressTemplateToUserPresetsOnce();
   void pruneAppUpdatePendingCache({ trigger: "startup" });
+
+  await ensureUiLanguageSelected();
 
   if (!mainWindow || mainWindow.isDestroyed()) {
     createMainWindow({ forceShow: !!pendingAppNavigationRoute });
