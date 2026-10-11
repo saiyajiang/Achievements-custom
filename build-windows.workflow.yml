@@ -1,0 +1,102 @@
+name: Build Windows Installer
+
+on:
+  workflow_dispatch:
+    inputs:
+      portable:
+        description: "同时产出绿色免安装版（portable）"
+        type: boolean
+        required: false
+        default: true
+      create_release:
+        description: "构建完成后自动创建 Release"
+        type: boolean
+        required: false
+        default: false
+      release_tag:
+        description: "Release 标签（仅在勾选创建 Release 时生效，如 v1.3.1-zh.1）"
+        type: string
+        required: false
+        default: ""
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          ref: zh-CN
+
+      - name: 安装 Node 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: 安装 Rust 工具链
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 安装依赖
+        run: npm install
+        shell: cmd
+
+      - name: 下载 Playwright Chromium
+        run: npm run dl-browsers
+        shell: cmd
+
+      - name: 编译原生录制模块（可选，失败不中断）
+        continue-on-error: true
+        run: npm run prepare:native:windows
+        shell: cmd
+
+      - name: 打包 NSIS 安装包（免签名）
+        run: >-
+          npx electron-builder --win --x64 --publish never
+          --config.win.signExecutable=false
+          --config.forceCodeSigning=false
+        shell: cmd
+
+      - name: 打包绿色免安装版
+        if: ${{ inputs.portable }}
+        run: >-
+          npx electron-builder --win portable --x64 --publish never
+          --config.win.signExecutable=false
+          --config.forceCodeSigning=false
+        shell: cmd
+
+      - name: 列出构建产物
+        run: dir dist
+        shell: cmd
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: Achievements-Windows
+          path: |
+            dist/*.exe
+            dist/latest.yml
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: 创建 Release
+        if: ${{ inputs.create_release && inputs.release_tag != '' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag }}
+          name: Achievements ${{ inputs.release_tag }}
+          body: |
+            由 GitHub Actions 自动构建的 Windows 版本。
+
+            - 基于本仓库 `zh-CN` 分支
+            - `Achievements-Setup-*.exe` 为安装版
+            - `Achievements-*.exe`（非 Setup）为绿色免安装版
+            - 未签名，Windows 可能提示来源未知，属正常现象
+
+            上游项目：[PSerban93/Achievements](https://github.com/PSerban93/Achievements)（MIT 许可）
+          files: |
+            dist/*.exe
+            dist/latest.yml
+          draft: true
