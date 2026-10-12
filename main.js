@@ -48,6 +48,87 @@ const {
   applyPendingProfileRestoreSync,
   cleanupProfileRestoreRollbacks,
 } = require("./utils/profile-backup");
+// === Data storage location resolution (must run before any app.getPath("userData") usage) ===
+// Reads data-location.json next to the executable:
+//   - missing file            -> default AppData location
+//   - {"mode":"portable"}     -> <exeDir>/AchievementsData
+//   - {"mode":"custom","customPath":"..."} -> custom absolute path
+// The resolved directory is applied via app.setPath("userData", ...) so every
+// later app.getPath("userData") call (collections.json, logs, tokens, sounds,
+// images, etc.) follows the chosen location.
+const DATA_LOCATION_CONFIG_FILENAME = "data-location.json";
+const DATA_LOCATION_PORTABLE_DIR_NAME = "AchievementsData";
+
+function resolveDataLocationExecutableDir() {
+  try {
+    return path.dirname(process.execPath);
+  } catch {
+    return process.cwd();
+  }
+}
+
+function resolveDataLocationConfigPath() {
+  return path.join(resolveDataLocationExecutableDir(), DATA_LOCATION_CONFIG_FILENAME);
+}
+
+function readDataLocationConfig() {
+  const configPath = resolveDataLocationConfigPath();
+  try {
+    if (!fs.existsSync(configPath)) return { mode: "appdata" };
+    const parsed = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return { mode: "appdata" };
+    }
+    const mode = parsed.mode;
+    if (mode === "portable") return { mode: "portable" };
+    if (
+      mode === "custom" &&
+      typeof parsed.customPath === "string" &&
+      parsed.customPath.trim()
+    ) {
+      return {
+        mode: "custom",
+        customPath: path.resolve(parsed.customPath.trim()),
+      };
+    }
+    return { mode: "appdata" };
+  } catch (error) {
+    return { mode: "appdata", error: error?.message || String(error) };
+  }
+}
+
+function resolveDataLocation() {
+  const config = readDataLocationConfig();
+  const exeDir = resolveDataLocationExecutableDir();
+  const configPath = resolveDataLocationConfigPath();
+  if (config.mode === "portable") {
+    return {
+      mode: "portable",
+      dataDir: path.join(exeDir, DATA_LOCATION_PORTABLE_DIR_NAME),
+      configPath,
+    };
+  }
+  if (config.mode === "custom" && config.customPath) {
+    return { mode: "custom", dataDir: config.customPath, configPath };
+  }
+  return { mode: "appdata", dataDir: app.getPath("userData"), configPath };
+}
+
+function defaultAppDataDir() {
+  return path.join(app.getPath("appData"), app.getName() || "Achievements");
+}
+
+const RESOLVED_DATA_LOCATION = resolveDataLocation();
+if (RESOLVED_DATA_LOCATION.mode !== "appdata") {
+  try {
+    fs.mkdirSync(RESOLVED_DATA_LOCATION.dataDir, { recursive: true });
+    app.setPath("userData", RESOLVED_DATA_LOCATION.dataDir);
+  } catch (error) {
+    // Keep the default AppData location if the custom directory cannot be used.
+    console.error("data-location:apply-failed", error?.message || String(error));
+  }
+}
+
 let startupProfileRestoreResult = null;
 try {
   startupProfileRestoreResult = applyPendingProfileRestoreSync({
@@ -7257,6 +7338,174 @@ ipcMain.handle("preferences:update", async (_event, newPrefs) => {
   return updatePreferences(newPrefs || {});
 });
 
+// === Data storage location IPC ===
+function computeTargetDataDirForMode(mode, customPath) {
+  if (mode === "portable") {
+    return path.join(
+      resolveDataLocationExecutableDir(),
+      DATA_LOCATION_PORTABLE_DIR_NAME,
+    );
+  }
+  if (mode === "custom") {
+    if (typeof customPath !== "string" || !customPath.trim()) {
+      throw new Error("Custom data folder path is required");
+    }
+    return path.resolve(customPath.trim());
+  }
+  return defaultAppDataDir();
+}
+
+function isPathInsideOrSame(childPath, parentPath) {
+  // Cross-platform containment check: the relative path from parent to child
+  // is empty (same dir), or does not start with ".." and is not absolute
+  // (strictly inside). Unlike a raw string prefix comparison this also works
+  // across case/separator differences handled by path.relative.
+  const rel = path.relative(parentPath, childPath);
+  if (rel === "") return { same: true, inside: false };
+  const inside = !rel.startsWith("..") && !path.isAbsolute(rel);
+  return { same: false, inside };
+}
+
+function writeDataLocationConfigAtomic(configPath, payload) {
+  // Write to a temp file in the same directory first, then rename over the
+  // real config so a crash can never leave a half-written JSON behind.
+  const tmpPath = configPath + ".tmp";
+  fs.writeFileSync(tmpPath, JSON.stringify(payload, null, 2), "utf-8");
+  fs.renameSync(tmpPath, configPath);
+}
+
+async function migrateDataDirectory(sourceDir, targetDir) {
+  // Copy first, then remove the old directory. On any failure roll back and
+  // keep the old data intact.
+  try {
+    await fs.promises.cp(sourceDir, targetDir, {
+      recursive: true,
+      force: true,
+      errorOnExist: false,
+    });
+  } catch (error) {
+    // Copy failed: the target was empty/absent before the copy, so any
+    // partially copied residue can be removed safely.
+    try {
+      await fs.promises.rm(targetDir, { recursive: true, force: true });
+    } catch {}
+    throw new Error(
+      "Failed to copy data folder: " + (error?.message || String(error)),
+    );
+  }
+  try {
+    await fs.promises.rm(sourceDir, { recursive: true, force: true });
+  } catch (error) {
+    // Rollback: copy the new directory back into the old location.
+    try {
+      await fs.promises.cp(targetDir, sourceDir, {
+        recursive: true,
+        force: true,
+        errorOnExist: false,
+      });
+    } catch {}
+    try {
+      await fs.promises.rm(targetDir, { recursive: true, force: true });
+    } catch {}
+    throw new Error(
+      "Failed to remove the old data folder: " + (error?.message || String(error)),
+    );
+  }
+}
+
+ipcMain.handle("data-location:get", () => {
+  return {
+    mode: RESOLVED_DATA_LOCATION.mode,
+    dataDir: RESOLVED_DATA_LOCATION.dataDir,
+    activeDir: app.getPath("userData"),
+    configPath: RESOLVED_DATA_LOCATION.configPath,
+    defaultAppDataDir: defaultAppDataDir(),
+  };
+});
+
+ipcMain.handle("data-location:set", async (_event, payload) => {
+  const request = payload && typeof payload === "object" ? payload : {};
+  const mode = request.mode;
+  if (!["appdata", "portable", "custom"].includes(mode)) {
+    return {
+      ok: false,
+      error: "Invalid mode. Expected appdata, portable or custom.",
+    };
+  }
+  let targetDir;
+  try {
+    targetDir = computeTargetDataDirForMode(mode, request.customPath);
+  } catch (error) {
+    return { ok: false, error: error?.message || String(error) };
+  }
+  const currentDir = path.resolve(app.getPath("userData"));
+  const resolvedTarget = path.resolve(targetDir);
+  const relation = isPathInsideOrSame(resolvedTarget, currentDir);
+  if (relation.inside) {
+    return {
+      ok: false,
+      error: "Target folder cannot be inside the current data folder.",
+    };
+  }
+  const configPath = RESOLVED_DATA_LOCATION.configPath;
+  const configPayload =
+    mode === "custom" ? { mode: "custom", customPath: resolvedTarget } : { mode };
+  try {
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    if (relation.same) {
+      writeDataLocationConfigAtomic(configPath, configPayload);
+      RESOLVED_DATA_LOCATION.mode = mode;
+      return { ok: true, restartRequired: false, dataDir: resolvedTarget };
+    }
+    // Different directory -> refuse to migrate into a non-empty target.
+    try {
+      const existingEntries = fs.existsSync(resolvedTarget)
+        ? fs.readdirSync(resolvedTarget)
+        : [];
+      if (existingEntries.length > 0) {
+        return {
+          ok: false,
+          error: "目标文件夹必须为空或不存在",
+        };
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        error:
+          "Failed to inspect target folder: " + (error?.message || String(error)),
+      };
+    }
+    // Different directory -> migrate existing data (copy, then remove old).
+    await migrateDataDirectory(currentDir, resolvedTarget);
+    try {
+      writeDataLocationConfigAtomic(configPath, configPayload);
+    } catch (error) {
+      // Roll back migration if the config file cannot be written.
+      try {
+        await fs.promises.cp(resolvedTarget, currentDir, {
+          recursive: true,
+          force: true,
+          errorOnExist: false,
+        });
+      } catch {}
+      try {
+        await fs.promises.rm(resolvedTarget, { recursive: true, force: true });
+      } catch {}
+      return {
+        ok: false,
+        error:
+          "Failed to write data-location.json: " +
+          (error?.message || String(error)),
+      };
+    }
+    RESOLVED_DATA_LOCATION.mode = mode;
+    RESOLVED_DATA_LOCATION.dataDir = resolvedTarget;
+    return { ok: true, restartRequired: true, dataDir: resolvedTarget };
+  } catch (error) {
+    return { ok: false, error: error?.message || String(error) };
+  }
+});
+
 const DASHBOARD_UI_STATE_VALUES = {
   viewMode: new Set(["both", "configs", "collections"]),
   collectionNameSort: new Set(["off", "asc", "desc"]),
@@ -7343,7 +7592,8 @@ ipcMain.handle("save-preferences", async (_event, newPrefs) =>
 
 ipcMain.on("set-zoom", (_event, zoomFactor) => {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    const safeZoom = Number(zoomFactor) || 1;
+    const safeZoom =
+      zoomFactor === "auto" ? "auto" : Number(zoomFactor) || 1;
     mainWindowUserZoom = safeZoom;
     applyMainWindowZoomFactor(safeZoom);
 
@@ -15841,13 +16091,14 @@ function logMainZoomState(userZoom, scaleFactor, effectiveZoom) {
 function applyMainWindowZoomFactor(userZoom = mainWindowUserZoom) {
   if (!mainWindow || mainWindow.isDestroyed()) return;
   const scale = getMainWindowScaleFactor() || 1;
-  const safeZoom = Number(userZoom) || 1;
-  mainWindowUserZoom = safeZoom;
-  const effectiveZoom = safeZoom / scale;
+  const isAutoZoom = userZoom === "auto";
+  const userZoomValue = isAutoZoom ? scale : Number(userZoom) || 1;
+  mainWindowUserZoom = isAutoZoom ? "auto" : userZoomValue;
+  const effectiveZoom = userZoomValue / scale;
   mainWindow.webContents.setZoomFactor(effectiveZoom);
-  logMainZoomState(safeZoom, scale, effectiveZoom);
+  logMainZoomState(isAutoZoom ? "auto" : userZoomValue, scale, effectiveZoom);
   mainWindow.webContents.send("zoom-factor-changed", {
-    userZoom: safeZoom,
+    userZoom: isAutoZoom ? "auto" : userZoomValue,
     effectiveZoom,
   });
 }
@@ -16141,7 +16392,10 @@ function createMainWindow(options = {}) {
     initialPreferences = fs.existsSync(preferencesPath)
       ? JSON.parse(fs.readFileSync(preferencesPath, "utf-8"))
       : {};
-    initialZoom = Number(initialPreferences.windowZoomFactor) || 1;
+    initialZoom =
+      initialPreferences.windowZoomFactor === "auto"
+        ? "auto"
+        : Number(initialPreferences.windowZoomFactor) || 1;
   } catch {}
   mainWindowUserZoom = initialZoom;
   let initialWindowBounds = { ...DEFAULT_MAIN_WINDOW_BOUNDS };
@@ -16157,7 +16411,8 @@ function createMainWindow(options = {}) {
     });
   }
   const initialScale = getDisplayScaleForBounds(initialWindowBounds);
-  const initialZoomFactor = initialZoom / (initialScale || 1);
+  const initialZoomFactor =
+    initialZoom === "auto" ? 1 : initialZoom / (initialScale || 1);
   mainWindow = new BrowserWindow({
     ...initialWindowBounds,
     frame: false,
@@ -16197,7 +16452,10 @@ function createMainWindow(options = {}) {
       const startupPresentation = resolveMainWindowStartupPresentation(prefs, {
         forceShow: forceShowOnLoad,
       });
-      const zoom = Number(prefs.windowZoomFactor) || 1;
+      const zoom =
+        prefs.windowZoomFactor === "auto"
+          ? "auto"
+          : Number(prefs.windowZoomFactor) || 1;
       setTimeout(() => {
         applyMainWindowZoomFactor(zoom);
       }, POST_BOOT_ZOOM_DELAY_MS);

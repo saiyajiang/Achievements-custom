@@ -2593,7 +2593,82 @@
                     <option value="1.25">125%</option>
                     <option value="1.5">150%</option>
                     <option value="2">200%</option>
+                    <option value="auto">Auto</option>
                   </select>
+                </div>
+              </section>
+              <section class="settings-section">
+                <h4 id="settings-dataLocationTitle">Data Storage Location</h4>
+                <div class="settings-control">
+                  <div>
+                    <label style="display: block">
+                      <input
+                        type="radio"
+                        name="data-location-mode"
+                        value="appdata"
+                        id="data-location-mode-appdata"
+                      />
+                      AppData (default)
+                    </label>
+                    <label style="display: block">
+                      <input
+                        type="radio"
+                        name="data-location-mode"
+                        value="portable"
+                        id="data-location-mode-portable"
+                      />
+                      Program folder (portable)
+                    </label>
+                    <label style="display: block">
+                      <input
+                        type="radio"
+                        name="data-location-mode"
+                        value="custom"
+                        id="data-location-mode-custom"
+                      />
+                      Custom folder
+                    </label>
+                  </div>
+                  <div
+                    id="data-location-customRow"
+                    style="
+                      display: none;
+                      margin-top: 6px;
+                      gap: 6px;
+                      align-items: center;
+                    "
+                  >
+                    <input
+                      type="text"
+                      id="settings-dataLocationCustomPath"
+                      placeholder="Choose a folder…"
+                      spellcheck="false"
+                      style="flex: 1; min-width: 0"
+                    />
+                    <button type="button" id="settings-dataLocationPickBtn">
+                      Choose…
+                    </button>
+                  </div>
+                  <div style="margin-top: 8px; font-size: 12px; opacity: 0.8">
+                    Current location:
+                    <code id="settings-dataLocationCurrent">…</code>
+                  </div>
+                  <div
+                    style="
+                      margin-top: 10px;
+                      display: flex;
+                      gap: 10px;
+                      align-items: center;
+                    "
+                  >
+                    <button type="button" id="settings-dataLocationSaveBtn">
+                      Save
+                    </button>
+                    <span
+                      id="settings-dataLocationStatus"
+                      style="font-size: 12px"
+                    ></span>
+                  </div>
                 </div>
               </section>
               <hr style="margin: 18px 0 14px" />
@@ -17114,12 +17189,12 @@
           const zoomDropdown = document.getElementById("app-zoom-dropdown");
           if (zoomDropdown) {
             zoomDropdown.value = prefs.windowZoomFactor.toString();
-            document.body.dataset.zoom = String(
-              Math.round((prefs.windowZoomFactor || 1) * 100),
-            );
-            document.body.dataset.effectiveZoom = String(
-              Math.round((prefs.windowZoomFactor || 1) * 100),
-            );
+            const zoomInitPercent =
+              prefs.windowZoomFactor === "auto"
+                ? 100
+                : Math.round((prefs.windowZoomFactor || 1) * 100);
+            document.body.dataset.zoom = String(zoomInitPercent);
+            document.body.dataset.effectiveZoom = String(zoomInitPercent);
             window.api.setZoom(prefs.windowZoomFactor);
           }
         }
@@ -17311,12 +17386,12 @@
               const zoomDropdown = document.getElementById("app-zoom-dropdown");
               if (zoomDropdown) {
                 zoomDropdown.value = prefs.windowZoomFactor.toString();
-                document.body.dataset.zoom = String(
-                  Math.round((prefs.windowZoomFactor || 1) * 100),
-                );
-                document.body.dataset.effectiveZoom = String(
-                  Math.round((prefs.windowZoomFactor || 1) * 100),
-                );
+                const zoomInitPercent =
+                  prefs.windowZoomFactor === "auto"
+                    ? 100
+                    : Math.round((prefs.windowZoomFactor || 1) * 100);
+                document.body.dataset.zoom = String(zoomInitPercent);
+                document.body.dataset.effectiveZoom = String(zoomInitPercent);
                 window.api.setZoom(prefs.windowZoomFactor);
               }
             }
@@ -18353,9 +18428,10 @@
         const el = document.getElementById(id);
         if (el) {
           el.addEventListener("change", () => {
-            const zoomValue = parseFloat(
-              document.getElementById("app-zoom-dropdown")?.value || 1,
-            );
+            const rawZoomValue =
+              document.getElementById("app-zoom-dropdown")?.value || 1;
+            const zoomValue =
+              rawZoomValue === "auto" ? "auto" : parseFloat(rawZoomValue);
             const prefs = {
               position: document.getElementById("positionDropdown")?.value,
               preset: document.getElementById("presetDropdown")?.value,
@@ -18372,12 +18448,10 @@
               ),
               windowZoomFactor: zoomValue,
             };
-            document.body.dataset.zoom = String(
-              Math.round((zoomValue || 1) * 100),
-            );
-            document.body.dataset.effectiveZoom = String(
-              Math.round((zoomValue || 1) * 100),
-            );
+            const zoomPercentValue =
+              zoomValue === "auto" ? 100 : Math.round((zoomValue || 1) * 100);
+            document.body.dataset.zoom = String(zoomPercentValue);
+            document.body.dataset.effectiveZoom = String(zoomPercentValue);
             window.api.savePreferences(prefs);
             window.api.setZoom(prefs.windowZoomFactor); // set zoom live
           });
@@ -25818,7 +25892,8 @@
         const byId = (id) => document.getElementById(id);
         const checkbox = (id) => !!byId(id)?.checked;
         const getVal = (id) => byId(id)?.value || "";
-        const zoomValue = parseFloat(getVal("app-zoom-dropdown"));
+        const rawZoomVal = getVal("app-zoom-dropdown");
+        const zoomValue = rawZoomVal === "auto" ? "auto" : parseFloat(rawZoomVal);
         const settingsScale = parseFloat(getVal("settings-scaleSlider"));
         const settingsPlaytimeScale = parseFloat(
           getVal("settings-playtimeScaleSlider"),
@@ -25948,9 +26023,12 @@
           recordFps: Number(getVal("settings-recordFpsSelect")) || 30,
           recordDurationSeconds:
             Number(getVal("settings-recordDurationSelect")) || 20,
-          windowZoomFactor: Number.isFinite(zoomValue)
-            ? zoomValue
-            : base.windowZoomFactor || 1,
+          windowZoomFactor:
+            zoomValue === "auto"
+              ? "auto"
+              : Number.isFinite(zoomValue)
+                ? zoomValue
+                : base.windowZoomFactor || 1,
           language: getGlobalAchievementLanguage(),
         };
 
@@ -26044,10 +26122,123 @@
       document
         .getElementById("app-zoom-dropdown")
         .addEventListener("change", (e) => {
-          const zoomValue = parseFloat(e.target.value);
+          const rawZoomSel = e.target.value;
+          const zoomValue = rawZoomSel === "auto" ? "auto" : parseFloat(rawZoomSel);
           window.api.setZoom(zoomValue);
           window.api.savePreferences({ windowZoomFactor: zoomValue });
         });
+
+      // Data storage location control
+      (function initDataLocationSettings() {
+        const modeInputs = Array.from(
+          document.querySelectorAll('input[name="data-location-mode"]'),
+        );
+        const customRow = document.getElementById("data-location-customRow");
+        const customPathInput = document.getElementById(
+          "settings-dataLocationCustomPath",
+        );
+        const pickBtn = document.getElementById("settings-dataLocationPickBtn");
+        const saveBtn = document.getElementById("settings-dataLocationSaveBtn");
+        const currentEl = document.getElementById(
+          "settings-dataLocationCurrent",
+        );
+        const statusEl = document.getElementById("settings-dataLocationStatus");
+        if (!modeInputs.length || !customRow || !customPathInput || !saveBtn) {
+          return;
+        }
+
+        function setDataLocationStatus(text, isError) {
+          if (!statusEl) return;
+          statusEl.textContent = text || "";
+          statusEl.style.color = isError
+            ? "var(--dracula-red, #ff5555)"
+            : "var(--dracula-green, #50fa7b)";
+        }
+
+        function applyDataLocationState(state) {
+          if (!state || typeof state !== "object") return;
+          for (const input of modeInputs) {
+            input.checked = input.value === state.mode;
+          }
+          customRow.style.display =
+            state.mode === "custom" ? "flex" : "none";
+          if (state.mode === "custom" && state.dataDir) {
+            customPathInput.value = state.dataDir;
+          } else if (state.mode === "appdata" && state.dataDir) {
+            customPathInput.value = "";
+          }
+          if (currentEl) {
+            currentEl.textContent = state.activeDir || state.dataDir || "";
+            currentEl.title = state.activeDir || state.dataDir || "";
+          }
+          setDataLocationStatus("");
+        }
+
+        window.api
+          .getDataLocation()
+          .then((state) => applyDataLocationState(state || {}))
+          .catch((err) =>
+            setDataLocationStatus(String(err?.message || err), true),
+          );
+
+        for (const input of modeInputs) {
+          input.addEventListener("change", () => {
+            customRow.style.display =
+              input.value === "custom" ? "flex" : "none";
+            setDataLocationStatus("");
+          });
+        }
+
+        pickBtn?.addEventListener("click", async () => {
+          try {
+            const folder = await window.api.selectFolder();
+            if (!folder) return;
+            customPathInput.value = folder;
+            const customInput = document.getElementById(
+              "data-location-mode-custom",
+            );
+            if (customInput) customInput.checked = true;
+            customRow.style.display = "flex";
+            setDataLocationStatus("");
+          } catch (err) {
+            setDataLocationStatus(String(err?.message || err), true);
+          }
+        });
+
+        saveBtn.addEventListener("click", async () => {
+          const selected = modeInputs.find((input) => input.checked);
+          if (!selected) return;
+          const payload = { mode: selected.value };
+          if (selected.value === "custom" && customPathInput.value.trim()) {
+            payload.customPath = customPathInput.value.trim();
+          }
+          if (selected.value === "custom" && !payload.customPath) {
+            setDataLocationStatus("Please choose a custom folder first", true);
+            return;
+          }
+          setDataLocationStatus("Saving…");
+          try {
+            const result = await window.api.setDataLocation(payload);
+            if (result && result.ok) {
+              setDataLocationStatus(
+                result.restartRequired
+                  ? "Saved. Restart required to apply the new location."
+                  : "Saved.",
+                false,
+              );
+              const state = await window.api.getDataLocation();
+              applyDataLocationState(state || {});
+            } else {
+              setDataLocationStatus(
+                result?.error || "Failed to save location",
+                true,
+              );
+            }
+          } catch (err) {
+            setDataLocationStatus(String(err?.message || err), true);
+          }
+        });
+      })();
 
       const DEFAULT_OVERLAY_CONTROLLER_TOGGLE_BINDING = Object.freeze([
         "BACK",
@@ -36383,11 +36574,13 @@
 
       window.api?.on?.("zoom-factor-changed", (z) => {
         const payload = z || {};
-        const userZoom =
-          Number(payload.userZoom ?? (typeof z === "number" ? z : NaN)) || 1;
+        const rawUserZoom =
+          payload.userZoom ?? (typeof z === "number" ? z : NaN);
         const effectiveZoom =
           Number(payload.effectiveZoom ?? (typeof z === "number" ? z : NaN)) ||
           1;
+        const userZoom =
+          rawUserZoom === "auto" ? effectiveZoom : Number(rawUserZoom) || 1;
         __userZoom = userZoom;
         __effectiveZoom = effectiveZoom;
         document.body.dataset.zoom = String(Math.round(__userZoom * 100));
@@ -36435,8 +36628,9 @@
       const zoomDd = document.getElementById("app-zoom-dropdown");
       if (zoomDd) {
         zoomDd.addEventListener("change", (e) => {
-          const z = parseFloat(e.target.value) || 1;
-          __userZoom = z;
+          const rawZoomSel = e.target.value;
+          const z = rawZoomSel === "auto" ? "auto" : parseFloat(rawZoomSel) || 1;
+          __userZoom = rawZoomSel === "auto" ? 1 : z;
           document.body.dataset.zoom = String(
             Math.round((__userZoom || 1) * 100),
           );
