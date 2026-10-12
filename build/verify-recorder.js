@@ -18,6 +18,9 @@ const packageJson = JSON.parse(
 );
 const outputDirectory =
   packageJson?.build?.directories?.output || "dist";
+const outputBase = path.isAbsolute(outputDirectory)
+  ? outputDirectory
+  : path.join(root, outputDirectory);
 
 const files = [
   {
@@ -46,8 +49,7 @@ if (process.argv.includes("--packaged")) {
   files.push({
     label: "packaged",
     filePath: path.join(
-      root,
-      outputDirectory,
+      outputBase,
       "win-unpacked",
       "resources",
       "app.asar.unpacked",

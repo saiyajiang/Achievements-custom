@@ -52,6 +52,16 @@ function verifyHdrScreenshot(options = {}) {
 
   const packaged = options.packaged === true;
 
+  const root = path.resolve(__dirname, "..");
+  const packageJson = JSON.parse(
+    fs.readFileSync(path.join(root, "package.json"), "utf8"),
+  );
+  const outputDirectory =
+    packageJson?.build?.directories?.output || "dist";
+  const outputBase = path.isAbsolute(outputDirectory)
+    ? outputDirectory
+    : path.join(root, outputDirectory);
+
   const sourcePath = path.resolve(
     "utils",
     "native",
@@ -65,8 +75,8 @@ function verifyHdrScreenshot(options = {}) {
     return 0;
   }
 
-  const packagedPath = path.resolve(
-    "dist",
+  const packagedPath = path.join(
+    outputBase,
     "win-unpacked",
     "resources",
     "app.asar.unpacked",
