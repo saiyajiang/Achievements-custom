@@ -833,6 +833,9 @@ contextBridge.exposeInMainWorld("api", {
     subscribeIpc("set-language", callback, (_event, lang) => [lang]),
 
   // Other functionalities
+  // Data storage location
+  getDataLocation: () => ipcRenderer.invoke("data-location:get"),
+  setDataLocation: (payload) => ipcRenderer.invoke("data-location:set", payload),
   savePreferences: (prefs) => ipcRenderer.invoke("preferences:update", prefs),
   updatePreferences: (prefs) => ipcRenderer.invoke("preferences:update", prefs),
   loadPreferences: () => ipcRenderer.invoke("load-preferences"),
